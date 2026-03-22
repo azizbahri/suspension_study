@@ -2,31 +2,34 @@
 
 This folder is split into three layers:
 
-- the theoretical core of the suspension-analysis framework,
+- the theoretical foundation of the suspension-analysis framework,
 - software-design documents that describe how the framework could be turned into a user-facing product,
 - implementation-facing documents that define backend contracts, data structures, and delivery sequencing.
 
 ## Start Here
 
-- [overview.md](overview.md): Main DAQ framework, equations, graph definitions, and tuning workflow
+- [foundation/overview.md](foundation/overview.md): Main DAQ framework, equations, graph definitions, and tuning workflow
 
-## Theoretical Core
+## Foundation Documents
 
-- [hardware_measurement_report.md](hardware_measurement_report.md): Hardware architecture, sensor roles, required measurements, ADC resolution, and logger sample-rate reasoning
-- [displacement_translation_report.md](displacement_translation_report.md): Front and rear displacement translation, calibration constants, and rear-linkage fitting
-- [velocity_calculation_report.md](velocity_calculation_report.md): Numerical differentiation, filtering, DAQ implementation, and wheel-versus-shaft velocity
-- [pitch_angle_report.md](pitch_angle_report.md): Gyroscope integration, bias control, numerical integration, and pitch-angle drift
-- [graphical_analysis_report.md](graphical_analysis_report.md): Travel histogram, velocity histogram, telemetry trace, and axis formulas
-- [spring_rate_preload_report.md](spring_rate_preload_report.md): Using Graph 1 to distinguish preload errors from spring-rate errors
-- [compression_damping_report.md](compression_damping_report.md): Using the compression side of Graph 2 to diagnose harshness and brake dive
-- [rebound_damping_report.md](rebound_damping_report.md): Using the rebound side of Graph 2 and telemetry to diagnose packing and pogo behavior
+- [foundation/README.md](foundation/README.md): Entry point for the theory and analysis foundation notes
+- [foundation/index.md](foundation/index.md): Foundation index and reading order
+- [foundation/overview.md](foundation/overview.md): Main DAQ framework, equations, graph definitions, and tuning workflow
+- [foundation/hardware_measurement_report.md](foundation/hardware_measurement_report.md): Hardware architecture, sensor roles, required measurements, ADC resolution, and logger sample-rate reasoning
+- [foundation/displacement_translation_report.md](foundation/displacement_translation_report.md): Front and rear displacement translation, calibration constants, and rear-linkage fitting
+- [foundation/velocity_calculation_report.md](foundation/velocity_calculation_report.md): Numerical differentiation, filtering, DAQ implementation, and wheel-versus-shaft velocity
+- [foundation/pitch_angle_report.md](foundation/pitch_angle_report.md): Gyroscope integration, bias control, numerical integration, and pitch-angle drift
+- [foundation/graphical_analysis_report.md](foundation/graphical_analysis_report.md): Travel histogram, velocity histogram, telemetry trace, and axis formulas
+- [foundation/spring_rate_preload_report.md](foundation/spring_rate_preload_report.md): Using Graph 1 to distinguish preload errors from spring-rate errors
+- [foundation/compression_damping_report.md](foundation/compression_damping_report.md): Using the compression side of Graph 2 to diagnose harshness and brake dive
+- [foundation/rebound_damping_report.md](foundation/rebound_damping_report.md): Using the rebound side of Graph 2 and telemetry to diagnose packing and pogo behavior
 
 ## Software Design
 
-- [software/README.md](software/README.md): Entry point for product and software-design notes
-- [software/index.md](software/index.md): Top-level index for software product and calibration design notes
-- [software/product/daq_visualization_software_report.md](software/product/daq_visualization_software_report.md): Product overview for a DAQ visualization application built on the theoretical framework
-- [software/calibration/calibration_profile_workflow.md](software/calibration/calibration_profile_workflow.md): Calibration-profile workflow for all derived formulas
+- [software-design/README.md](software-design/README.md): Entry point for product, calibration, UI, and technology design notes
+- [software-design/index.md](software-design/index.md): Top-level index for software design material
+- [software-design/product/daq_visualization_software_report.md](software-design/product/daq_visualization_software_report.md): Product overview for a DAQ visualization application built on the theoretical framework
+- [software-design/calibration/calibration_profile_workflow.md](software-design/calibration/calibration_profile_workflow.md): Calibration-profile workflow for all derived formulas
 
 ## Implementation Planning
 
@@ -38,29 +41,29 @@ This folder is split into three layers:
 
 ## Suggested Reading Order
 
-1. [overview.md](overview.md)
-2. [hardware_measurement_report.md](hardware_measurement_report.md)
-3. [displacement_translation_report.md](displacement_translation_report.md)
-4. [velocity_calculation_report.md](velocity_calculation_report.md)
-5. [pitch_angle_report.md](pitch_angle_report.md)
-6. [graphical_analysis_report.md](graphical_analysis_report.md)
-7. [spring_rate_preload_report.md](spring_rate_preload_report.md)
-8. [compression_damping_report.md](compression_damping_report.md)
-9. [rebound_damping_report.md](rebound_damping_report.md)
+1. [foundation/overview.md](foundation/overview.md)
+2. [foundation/hardware_measurement_report.md](foundation/hardware_measurement_report.md)
+3. [foundation/displacement_translation_report.md](foundation/displacement_translation_report.md)
+4. [foundation/velocity_calculation_report.md](foundation/velocity_calculation_report.md)
+5. [foundation/pitch_angle_report.md](foundation/pitch_angle_report.md)
+6. [foundation/graphical_analysis_report.md](foundation/graphical_analysis_report.md)
+7. [foundation/spring_rate_preload_report.md](foundation/spring_rate_preload_report.md)
+8. [foundation/compression_damping_report.md](foundation/compression_damping_report.md)
+9. [foundation/rebound_damping_report.md](foundation/rebound_damping_report.md)
 
 ## Software Reading Path
 
-1. [overview.md](overview.md)
-2. [software/README.md](software/README.md)
-3. [software/index.md](software/index.md)
-4. [software/product/daq_visualization_software_report.md](software/product/daq_visualization_software_report.md)
-5. [software/calibration/calibration_profile_workflow.md](software/calibration/calibration_profile_workflow.md)
+1. [foundation/overview.md](foundation/overview.md)
+2. [software-design/README.md](software-design/README.md)
+3. [software-design/index.md](software-design/index.md)
+4. [software-design/product/daq_visualization_software_report.md](software-design/product/daq_visualization_software_report.md)
+5. [software-design/calibration/calibration_profile_workflow.md](software-design/calibration/calibration_profile_workflow.md)
 
 ## Implementation Reading Path
 
-1. [software/product/daq_visualization_software_report.md](software/product/daq_visualization_software_report.md)
-2. [software/calibration/calibration_profile_workflow.md](software/calibration/calibration_profile_workflow.md)
-3. [software/calibration/calibration_profile_data_model.md](software/calibration/calibration_profile_data_model.md)
+1. [software-design/product/daq_visualization_software_report.md](software-design/product/daq_visualization_software_report.md)
+2. [software-design/calibration/calibration_profile_workflow.md](software-design/calibration/calibration_profile_workflow.md)
+3. [software-design/calibration/calibration_profile_data_model.md](software-design/calibration/calibration_profile_data_model.md)
 4. [implementation/README.md](implementation/README.md)
 5. [implementation/api_contract.md](implementation/api_contract.md)
 6. [implementation/communication_architecture.md](implementation/communication_architecture.md)

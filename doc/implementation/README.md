@@ -5,7 +5,7 @@ This folder contains implementation-facing documents that translate the theory a
 These notes are intentionally separate from:
 
 - the theoretical core in the parent folder,
-- the software-design notes in [../software/README.md](../software/README.md).
+- the software-design notes in [../software-design/README.md](../software-design/README.md).
 
 The purpose of this folder is to define how the backend, persistence layer, and frontend integration should actually be built.
 

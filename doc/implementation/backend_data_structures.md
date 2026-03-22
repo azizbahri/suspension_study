@@ -123,7 +123,7 @@ Required fields:
 - `provenanceSummary`
 - `revisionMetadata`
 
-This structure should match the conceptual design in [../software/calibration/calibration_profile_data_model.md](../software/calibration/calibration_profile_data_model.md), but in implementation terms it becomes the actual canonical object used by services.
+This structure should match the conceptual design in [../software-design/calibration/calibration_profile_data_model.md](../software-design/calibration/calibration_profile_data_model.md), but in implementation terms it becomes the actual canonical object used by services.
 
 ### 4.2 BikeMetadata
 

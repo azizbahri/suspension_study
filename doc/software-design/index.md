@@ -1,8 +1,8 @@
 # Suspension DAQ Software Design Index
 
-This directory contains software-design material derived from the theoretical suspension-analysis framework in the parent [doc](../README.md) directory.
+This directory contains software-design material derived from the theoretical suspension-analysis foundation in the parent [doc](../README.md) directory.
 
-The software material is separated into two main design tracks:
+The software material is separated into four design tracks:
 
 - product design,
 - calibration design,

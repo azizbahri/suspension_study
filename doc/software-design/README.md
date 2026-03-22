@@ -1,6 +1,6 @@
 # Suspension DAQ Software Design Notes
 
-This folder contains product and software-design documents built on top of the theoretical framework in the parent [doc](../README.md) directory.
+This folder contains product and software-design documents built on top of the theoretical foundation in the parent [doc](../README.md) directory.
 
 The documents here are not part of the core derivation set. They describe how the theory can be turned into a usable software product for data import, visualization, comparison, and tuning interpretation.
 
@@ -42,14 +42,14 @@ Technology decisions and architecture notes are kept separate as well so impleme
 
 ## Relationship to the Theory Notes
 
-Read the theory documents in the parent folder first if you want the mathematical and mechanical basis for the software:
+Read the foundation documents first if you want the mathematical and mechanical basis for the software:
 
-1. [../overview.md](../overview.md)
-2. [../hardware_measurement_report.md](../hardware_measurement_report.md)
-3. [../displacement_translation_report.md](../displacement_translation_report.md)
-4. [../velocity_calculation_report.md](../velocity_calculation_report.md)
-5. [../pitch_angle_report.md](../pitch_angle_report.md)
-6. [../graphical_analysis_report.md](../graphical_analysis_report.md)
-7. [../spring_rate_preload_report.md](../spring_rate_preload_report.md)
-8. [../compression_damping_report.md](../compression_damping_report.md)
-9. [../rebound_damping_report.md](../rebound_damping_report.md)
+1. [../foundation/overview.md](../foundation/overview.md)
+2. [../foundation/hardware_measurement_report.md](../foundation/hardware_measurement_report.md)
+3. [../foundation/displacement_translation_report.md](../foundation/displacement_translation_report.md)
+4. [../foundation/velocity_calculation_report.md](../foundation/velocity_calculation_report.md)
+5. [../foundation/pitch_angle_report.md](../foundation/pitch_angle_report.md)
+6. [../foundation/graphical_analysis_report.md](../foundation/graphical_analysis_report.md)
+7. [../foundation/spring_rate_preload_report.md](../foundation/spring_rate_preload_report.md)
+8. [../foundation/compression_damping_report.md](../foundation/compression_damping_report.md)
+9. [../foundation/rebound_damping_report.md](../foundation/rebound_damping_report.md)
