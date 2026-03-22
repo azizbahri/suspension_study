@@ -2,6 +2,8 @@
 
 This repository contains a documentation set for motorcycle suspension data acquisition, signal processing, graphical interpretation, tuning decisions, and software concepts built on that theory.
 
+It now also includes an early frontend implementation for the suspension DAQ application shell described in the documentation.
+
 ## Documentation
 
 The main documentation lives in [doc/README.md](doc/README.md).
@@ -31,3 +33,65 @@ Software-design material:
 
 - product-level DAQ visualization concepts built on the core theory,
 - calibration-design workflows for the formulas used by the software.
+
+## Frontend
+
+The repository includes a React and TypeScript frontend prototype under [frontend](frontend).
+
+Current frontend scope:
+
+- application shell and navigation,
+- import workflow UI,
+- calibration workflow shell,
+- persistent status and trust panel,
+- placeholder routes for later analysis and comparison work.
+
+### Frontend Setup
+
+Prerequisites:
+
+- Node.js 20 or newer,
+- npm.
+
+Install dependencies:
+
+```powershell
+Set-Location frontend
+npm install
+```
+
+### Run the Frontend
+
+Start the Vite development server:
+
+```powershell
+Set-Location frontend
+npm run dev
+```
+
+By default, Vite serves the app locally at `http://localhost:5173`.
+
+### Build the Frontend
+
+Create a production build:
+
+```powershell
+Set-Location frontend
+npm run build
+```
+
+The build output is written to [frontend/dist](frontend/dist).
+
+### Lint the Frontend
+
+Run ESLint:
+
+```powershell
+Set-Location frontend
+npm run lint
+```
+
+### Frontend Notes
+
+- The frontend is currently mock-data driven and does not yet call a live Python backend.
+- The intended long-term architecture is a React and TypeScript frontend with a Python analysis service boundary, as described in the documentation.
