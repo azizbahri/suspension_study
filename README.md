@@ -13,6 +13,7 @@ Key entry points:
 - [doc/overview.md](doc/overview.md): Main framework document
 - [doc/README.md](doc/README.md): Documentation index and reading guide
 - [doc/software/README.md](doc/software/README.md): Software-design notes derived from the theoretical framework
+- [doc/software/index.md](doc/software/index.md): Software product and calibration design index
 
 ## Scope
 
@@ -28,4 +29,5 @@ Theoretical core:
 
 Software-design material:
 
-- product-level DAQ visualization concepts built on the core theory.
+- product-level DAQ visualization concepts built on the core theory,
+- calibration-design workflows for the formulas used by the software.

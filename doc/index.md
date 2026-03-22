@@ -22,8 +22,10 @@ This directory contains two categories of material:
 
 ## Software Design Notes
 
-- [software/README.md](software/README.md): Index for product and software-design notes.
-- [software/daq_visualization_software_report.md](software/daq_visualization_software_report.md): Product overview of a visualization tool that imports DAQ logs, generates the main analysis graphs, and supports tuning decisions.
+- [software/README.md](software/README.md): Entry point for product and software-design notes.
+- [software/index.md](software/index.md): Top-level software-design index.
+- [software/product/daq_visualization_software_report.md](software/product/daq_visualization_software_report.md): Product overview of a visualization tool that imports DAQ logs, generates the main analysis graphs, and supports tuning decisions.
+- [software/calibration/calibration_profile_workflow.md](software/calibration/calibration_profile_workflow.md): Calibration workflow for building and validating the constants behind the analysis formulas.
 
 ## Recommended Reading Order
 
@@ -41,4 +43,6 @@ This directory contains two categories of material:
 
 1. [overview.md](overview.md)
 2. [software/README.md](software/README.md)
-3. [software/daq_visualization_software_report.md](software/daq_visualization_software_report.md)
+3. [software/index.md](software/index.md)
+4. [software/product/daq_visualization_software_report.md](software/product/daq_visualization_software_report.md)
+5. [software/calibration/calibration_profile_workflow.md](software/calibration/calibration_profile_workflow.md)

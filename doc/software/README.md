@@ -4,10 +4,25 @@ This folder contains product and software-design documents built on top of the t
 
 The documents here are not part of the core derivation set. They describe how the theory can be turned into a usable software product for data import, visualization, comparison, and tuning interpretation.
 
-## Software Design Documents
+The software documents are organized into subdirectories so product design and calibration design can evolve independently.
 
-- [daq_visualization_software_report.md](daq_visualization_software_report.md): Product-level overview of a DAQ visualization application for suspension analysis and tuning support
-- [calibration_profile_workflow.md](calibration_profile_workflow.md): Detailed design note for building, validating, and maintaining calibration profiles for all derived formulas
+## Software Index
+
+- [index.md](index.md): Top-level index for the software-design documentation
+
+## Product Design
+
+- [product/README.md](product/README.md): Product-design notes index
+- [product/daq_visualization_software_report.md](product/daq_visualization_software_report.md): Product-level overview of a DAQ visualization application for suspension analysis and tuning support
+
+## Calibration Design
+
+- [calibration/README.md](calibration/README.md): Calibration-design notes index
+- [calibration/calibration_profile_workflow.md](calibration/calibration_profile_workflow.md): Detailed design note for building, validating, and maintaining calibration profiles for all derived formulas
+- [calibration/front_travel_calibration_design.md](calibration/front_travel_calibration_design.md): Front calibration screen and workflow design
+- [calibration/rear_travel_calibration_design.md](calibration/rear_travel_calibration_design.md): Rear calibration and linkage screen design
+- [calibration/velocity_processing_design.md](calibration/velocity_processing_design.md): Velocity setup, filtering, and validation design
+- [calibration/pitch_processing_design.md](calibration/pitch_processing_design.md): Pitch setup, bias, and validation design
 
 ## Relationship to the Theory Notes
 

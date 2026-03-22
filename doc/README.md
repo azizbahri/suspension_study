@@ -23,7 +23,9 @@ This folder is split into two layers:
 ## Software Design
 
 - [software/README.md](software/README.md): Entry point for product and software-design notes
-- [software/daq_visualization_software_report.md](software/daq_visualization_software_report.md): Product overview for a DAQ visualization application built on the theoretical framework
+- [software/index.md](software/index.md): Top-level index for software product and calibration design notes
+- [software/product/daq_visualization_software_report.md](software/product/daq_visualization_software_report.md): Product overview for a DAQ visualization application built on the theoretical framework
+- [software/calibration/calibration_profile_workflow.md](software/calibration/calibration_profile_workflow.md): Calibration-profile workflow for all derived formulas
 
 ## Suggested Reading Order
 
@@ -41,7 +43,9 @@ This folder is split into two layers:
 
 1. [overview.md](overview.md)
 2. [software/README.md](software/README.md)
-3. [software/daq_visualization_software_report.md](software/daq_visualization_software_report.md)
+3. [software/index.md](software/index.md)
+4. [software/product/daq_visualization_software_report.md](software/product/daq_visualization_software_report.md)
+5. [software/calibration/calibration_profile_workflow.md](software/calibration/calibration_profile_workflow.md)
 
 ## Legacy Index
 

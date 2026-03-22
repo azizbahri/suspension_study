@@ -235,6 +235,8 @@ $$
 
 and show the effect of the chosen angle.
 
+Further detail for the front-specific screen is provided in [front_travel_calibration_design.md](front_travel_calibration_design.md).
+
 ### 4.5 Step 5: Fit the Rear Travel Conversion
 
 For the rear channel, the software should separate sensor calibration from linkage calibration.
@@ -261,6 +263,8 @@ The software should let the user:
 
 This is important because rear linkage behavior is bike-specific and usually nonlinear.
 
+Further detail for the rear-specific screen is provided in [rear_travel_calibration_design.md](rear_travel_calibration_design.md).
+
 ### 4.6 Step 6: Configure Velocity Processing
 
 Velocity is not calibrated only by sensor constants. It also depends on signal-processing choices. The software should therefore expose:
@@ -273,6 +277,8 @@ Velocity is not calibrated only by sensor constants. It also depends on signal-p
 
 The user should be able to verify that the selected method preserves real suspension events without turning noise into false high-speed motion.
 
+Further detail for velocity setup is provided in [velocity_processing_design.md](velocity_processing_design.md).
+
 ### 4.7 Step 7: Configure Pitch Processing
 
 Pitch setup should guide the user through:
@@ -284,6 +290,8 @@ Pitch setup should guide the user through:
 - previewing the integrated pitch trace.
 
 The software should also warn when drift becomes large enough that interpretation becomes questionable.
+
+Further detail for pitch setup is provided in [pitch_processing_design.md](pitch_processing_design.md).
 
 ### 4.8 Step 8: Validate the Whole Profile
 
