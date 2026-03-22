@@ -6,6 +6,8 @@ This repository contains a technical documentation set for motorcycle suspension
 
 The main documentation lives in [doc/README.md](doc/README.md).
 
+This repository also includes workspace-specific Copilot instructions in [.github/copilot-instructions.md](.github/copilot-instructions.md) so future requests are evaluated with the project's hardware-plus-software engineering perspective.
+
 Key entry points:
 
 - [doc/overview.md](doc/overview.md): Main framework document
