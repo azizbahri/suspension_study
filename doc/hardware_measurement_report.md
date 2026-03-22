@@ -2,7 +2,7 @@
 
 ## Abstract
 
-This report expands Section 1 of [overview.md](overview.md) by explaining what the required DAQ hardware means in practical engineering terms. The objective is to clarify why each sensor is needed, what physical quantity it measures, how its range and resolution affect the later calculations, and which minimum set of measurements is required to construct the plots and formulas used throughout the suspension-analysis framework. Crucially, it addresses the real-world signal processing requirements—such as ratiometric ADC measurement and sensor fusion—necessary to transition from theoretical physics to a functional, noise-resistant product architecture.
+This report expands Section 1 of [overview.md](overview.md) by explaining what the required DAQ hardware means in practical engineering terms. The objective is to clarify why each sensor is needed, what physical quantity it measures, how its range and resolution affect the later calculations, and which minimum set of measurements is required to construct the plots and formulas used throughout the suspension-analysis framework. It also addresses practical implementation considerations, such as supply-referenced measurement stability and long-horizon IMU drift mitigation, that become important when transitioning from theoretical physics to a functional measurement system.
 
 ---
 
@@ -13,17 +13,17 @@ Section 1 of the overview defines the data-acquisition stack required to turn su
 At a high level, the DAQ system must provide four things:
 
 1. suspension displacement,
-2. angular-rate and acceleration data for fused pitch estimation,
+2. angular-rate data for pitch estimation, with accelerometer data available for drift correction and dynamic context,
 3. acceleration data for impact and braking context,
 4. a time base with enough sampling rate to resolve high-speed suspension events.
 
 The measurement chain can be summarized as
 
 $$
-\text{Sensors} \rightarrow \text{DAQ channels} \rightarrow \text{Signal Processing (Filtering/Fusion)} \rightarrow \text{calibrated physical variables} \rightarrow \text{plots and tuning decisions}
+	ext{Sensors} \rightarrow \text{DAQ channels} \rightarrow \text{Signal Conditioning and Optional Fusion} \rightarrow \text{calibrated physical variables} \rightarrow \text{plots and tuning decisions}
 $$
 
-Everything in the later sections depends on the quality and stability of this chain.
+Everything in the later sections depends on the quality, stability, and calibration of this chain.
 
 ---
 
@@ -38,7 +38,9 @@ Section 1 is specifying the minimum hardware required to measure the state varia
 - longitudinal acceleration,
 - ride-time distributions in travel and velocity space.
 
-If a required signal is not measured with adequate range, adequate resolution, adequate stability, or adequate sample rate, then the later mathematical framework becomes unreliable. 
+If a required signal is not measured with adequate range, adequate resolution, adequate stability, or adequate sample rate, then the later mathematical framework becomes unreliable.
+
+The hardware therefore still has to be chosen by working backward from the later equations and plots.
 
 ---
 
@@ -81,27 +83,34 @@ $$
 W_{rear,n} = a s_{rear,n}^2 + b s_{rear,n} + c
 $$
 
-### 3.3 IMU Sensor Fusion Channels (Gyro & Accel for Pitch)
+### 3.3 Gyroscope Pitch-Rate Channel, with Optional Accelerometer Correction
 
 Needed for:
 
-- stable pitch-angle estimation,
+- pitch-angle estimation,
 - brake-dive interpretation,
 - chassis load-transfer analysis.
 
-Unlike pure integration, a stable pitch channel requires fusing the gyroscope rate ($\omega_y$) with the accelerometer gravity vector ($\phi_{acc}$):
+The mathematical framework in the overview uses the gyroscope pitch-rate channel directly:
+
+$$
+\phi_n = \phi_{n-1} + \frac{\omega_{y,f,n} + \omega_{y,f,n-1}}{2} \Delta t
+$$
+
+In practical systems, long-horizon pitch stability may be improved by combining gyroscope integration with an accelerometer-derived attitude estimate. One common low-cost implementation is a complementary filter:
 
 $$
 \phi_n = \alpha \cdot (\phi_{n-1} + \omega_{y,n} \cdot \Delta t) + (1 - \alpha) \cdot \phi_{acc,n}
 $$
 
-### 3.4 Accelerometer Channel (Longitudinal & Vertical)
+### 3.4 Accelerometer Channel
 
 Needed for:
 
 - harshness or impact confirmation,
 - braking and acceleration context,
-- overlay in the pitch telemetry graph.
+- overlay in the pitch telemetry graph,
+- optional gravity-reference input for attitude stabilization.
 
 This is used in:
 
@@ -145,7 +154,7 @@ where:
 - $V_0$ is the zero offset,
 - $C_{cal}$ is the calibration constant in mm/V.
 
-*Note: In practice, converting this voltage requires specific electrical architectures to prevent noise from ruining the derivative calculations (see Section 5.4).*
+*Note: In practice, the measurement architecture should minimize supply-reference error and electrical noise so the derivative calculations remain reliable (see Section 5.4).*
 
 ### 4.2 Why a Front Sensor Is Required
 
@@ -185,21 +194,23 @@ $$
 
 If the displacement channel is too coarse, the velocity histogram becomes noisy and unusable. 
 
-### 5.4 The Ratiometric Measurement Mandate (Critical Fix)
+### 5.4 Practical Benefit of Ratiometric Measurement
 
 Motorcycle electrical systems are incredibly noisy. If the 5V supply to the linear potentiometer drops by just 50mV due to the radiator fan turning on, an absolute ADC measurement will register a sudden drop in $V_{raw}$. The mathematical framework will interpret this voltage drop as a massive suspension movement, resulting in a severe, artificial velocity spike ($v > 500 \text{ mm/s}$) that ruins the data.
 
-To prevent this, the DAQ must use **Ratiometric Measurement**. The ADC reference voltage ($V_{ref}$) and the potentiometer supply voltage must be the exact same electrical trace. Therefore, any fluctuation in the supply voltage causes an equal fluctuation in the ADC reference, cancelling out the error. 
+For potentiometric sensors, a ratiometric measurement architecture is therefore highly desirable. If the ADC reference voltage ($V_{ref}$) and the potentiometer supply voltage track the same source, much of the supply variation cancels in the digital measurement. This does not remove the need for calibration, but it greatly reduces one important source of artificial displacement noise.
 
-Instead of measuring absolute voltage, the firmware maps raw ADC counts directly to stroke:
+In practice, the same calibration can be written in count space rather than voltage space:
 
 $$
-s_{n} = \left( \frac{\text{ADC}_{raw,n}}{2^N - 1} \right) \cdot s_{max}
+s_n = (\text{ADC}_{raw,n} - \text{ADC}_0) \cdot C_{count}
 $$
+
+where $\text{ADC}_0$ is the count-domain zero offset and $C_{count}$ is the calibration constant in mm/count. This is mathematically equivalent to voltage-domain calibration when the measurement chain is characterized correctly.
 
 ---
 
-## 6. IMU: Why a 6-Axis Unit and Sensor Fusion Are Required
+## 6. IMU: Why a 6-Axis Unit Is Required, and Why Drift Mitigation Matters
 
 The overview specifies a 6-axis IMU because the framework needs both acceleration and angular-rate information to establish chassis attitude.
 
@@ -207,7 +218,7 @@ The overview specifies a 6-axis IMU because the framework needs both acceleratio
 
 The accelerometer provides the inertial context for the suspension events (e.g., was a suspension spike due to a rock, or from hard braking?). It answers how severe the load transfer or chassis input was.
 
-### 6.2 The Flaw of Pure Gyroscope Integration
+### 6.2 Limitation of Pure Gyroscope Integration
 
 A naive approach to calculating chassis pitch ($\phi$) simply integrates the Y-axis gyroscope data over time:
 
@@ -215,11 +226,11 @@ $$
 \phi_{drift}(t) = \int_{0}^{t} (\omega_y(\tau) + \text{bias}) \, d\tau
 $$
 
-**The Reality:** Due to thermal noise and microscopic sensor bias, pure integration results in an *unbounded random walk*. Within 60 seconds of riding, the software will calculate that the motorcycle is doing a backflip, even if it is parked. Pure integration cannot be used in a real-world product.
+**The practical issue:** Due to thermal drift, sensor bias, and integration error, pure gyroscope integration accumulates error over time. For short transient events, this may be acceptable. For longer recordings or for stable absolute attitude estimation, some form of drift mitigation is usually required.
 
-### 6.3 Sensor Fusion: The Complementary Filter Architecture
+### 6.3 One Practical Drift-Mitigation Method: Complementary Filtering
 
-To achieve stable, drift-free pitch estimation, the DAQ must employ **Sensor Fusion**. The most efficient method for a microcontroller is a Complementary Filter. This acts as a high-pass filter on the integrated gyroscope (trusting it for fast, short-term movements like brake dive) and a low-pass filter on the accelerometer (trusting its gravity vector for long-term absolute levelness).
+For robust long-horizon pitch estimation, many systems combine the integrated gyroscope signal with an accelerometer-derived gravity reference. A complementary filter is one common low-cost approach. It acts as a high-pass path on the integrated gyroscope and a low-pass path on the accelerometer attitude estimate.
 
 First, calculate the absolute pitch from the accelerometer's gravity vector:
 $$
@@ -231,7 +242,7 @@ $$
 \phi_n = \alpha \cdot (\phi_{n-1} + \omega_{y,n} \cdot \Delta t) + (1 - \alpha) \cdot \phi_{acc,n}
 $$
 
-*(Note: During hard longitudinal acceleration or braking where total $G \neq 1g$, the firmware dynamically forces $\alpha \to 0.999$ to ignore the corrupted accelerometer data).*
+During hard longitudinal acceleration or braking, accelerometer-derived pitch becomes less trustworthy because the accelerometer is measuring both gravity and linear acceleration. In those conditions, practical implementations often increase the gyroscope weighting, but the exact adaptation logic is firmware-specific and should be treated as a design choice rather than a universal requirement.
 
 ---
 
@@ -253,18 +264,18 @@ The overview specifies a minimum sample rate of 250 Hz ($\Delta t = 0.004 \text{
 
 ### 9.1 Why Time Resolution Matters
 
-If a motorcycle hits a square-edged rock at 20 m/s, the wheel moves 80 mm horizontally between 250 Hz samples. Slower sampling rates will completely miss the peak velocity of the damping spike. (For high-end diagnostic products, 500 Hz to 1000 Hz is preferred).
+Fast suspension events can have characteristic durations on the order of only a few milliseconds. At 250 Hz, the sample interval is 4 ms, which gives only a limited number of samples across a sharp impact. Slower sampling rates reduce the fidelity of the reconstructed displacement and velocity traces even further. For higher-end diagnostic products, 500 Hz to 1000 Hz may therefore be preferable when the logger, storage, and noise floor permit it.
 
-### 9.2 Zero-Phase Filtering Requirement
+### 9.2 Post-Processing Alignment Consideration
 
-Because velocity is calculated via a finite difference ($v_n \approx \frac{W_{f,n} - W_{f,n-1}}{\Delta t}$), high-frequency noise is severely amplified. While a standard low-pass Butterworth filter cleans this noise, it introduces *group delay* (phase shift), making the velocity peak appear artificially late compared to the IMU G-spike. The software architecture must utilize **Zero-Phase Filtering** (forward-backward filtering) during post-processing to keep the time-domains perfectly aligned.
+Because velocity is calculated via a finite difference ($v_n \approx \frac{W_{f,n} - W_{f,n-1}}{\Delta t}$), high-frequency noise is severely amplified. A standard low-pass Butterworth filter reduces that noise but may introduce phase delay. For offline post-processing, zero-phase forward-backward filtering is often useful when precise alignment between velocity peaks and IMU spikes is important. For real-time systems, however, causal filtering must be used instead.
 
 ---
 
 ## 10. What Measurements Are Needed for Each Plot
 
 ### 10.1 Graph 1: Position or Travel Histogram
-* **Required:** Ratiometric displacement ADC counts, calibration constants, total available wheel travel.
+* **Required:** Calibrated displacement channel, calibration constants and offsets, total available wheel travel.
 * **Derived:** $P_n = 100 \cdot \frac{W_n}{W_{max}}$
 
 ### 10.2 Graph 2: Velocity Histogram
@@ -272,23 +283,24 @@ Because velocity is calculated via a finite difference ($v_n \approx \frac{W_{f,
 * **Derived:** $v_n \approx \frac{W_{f,n} - W_{f,n-1}}{\Delta t}$
 
 ### 10.3 Graph 3: Pitch Angle Versus Time
-* **Required:** Gyroscope Y-axis, Accelerometer X/Y/Z axes, sample interval, sensor fusion algorithm.
-* **Derived:** $\phi_n = \alpha \cdot (\phi_{n-1} + \omega_{y,n} \cdot \Delta t) + (1 - \alpha) \cdot \phi_{acc,n}$
+* **Required:** Gyroscope Y-axis, longitudinal accelerometer channel, sample interval, bias estimate, and optionally full IMU acceleration if attitude stabilization is used.
+* **Derived:** Baseline framework: $\phi_n = \phi_{n-1} + \frac{\omega_{y,f,n} + \omega_{y,f,n-1}}{2} \Delta t$. One practical stabilized alternative is a complementary filter using $\phi_{acc}$.
 
 ---
 
 ## 11. Sensor-Channel Summary Table
 
-| Channel | Measured Quantity | Primary Formula Dependencies | Primary Plot Dependencies |
-| --- | --- | --- | --- |
-| Front potentiometer | ADC Count (Ratiometric) | $s_{front} = \left( \frac{\text{ADC}}{2^N - 1} \right) \cdot s_{max}$ | Graph 1 & 2 front histograms |
-| Rear potentiometer | ADC Count (Ratiometric) | $W_{rear} = a s_{rear}^2 + b s_{rear} + c$ | Graph 1 & 2 rear histograms |
-| Gyroscope Y-axis | Pitch rate ($\omega_y$) | $\phi_n$ (Short-term fusion component) | Graph 3 pitch-angle trace |
-| Accelerometer X/Y/Z | Gravity vector & Impact Gs | $\phi_{acc} = \text{atan2}(-a_x, \sqrt{a_y^2 + a_z^2})$ | Graph 3 pitch correction & Graph 2 context |
-| Logger time base | Sample timing | $v_n \approx \frac{W_{f,n} - W_{f,n-1}}{\Delta t}$ | Required for all histograms and rates |
+| Channel | Measured Quantity | Typical Unit | Primary Formula Dependencies | Primary Plot Dependencies |
+| --- | --- | --- | --- | --- |
+| Front potentiometer | Front displacement signal, preferably measured with a supply-stable or ratiometric architecture | counts or V | $W_{front} = (V_{front} - V_{0,front}) \cdot C_{front} \cdot \cos(\theta)$ or count-domain equivalent | Graph 1 & 2 front histograms |
+| Rear potentiometer | Rear displacement signal, preferably measured with a supply-stable or ratiometric architecture | counts or V | $s_{rear} = (V_{rear} - V_{0,rear}) \cdot C_{rear}$ and $W_{rear} = a s_{rear}^2 + b s_{rear} + c$ | Graph 1 & 2 rear histograms |
+| Gyroscope Y-axis | Pitch rate $\omega_y$ | deg/s or rad/s | $\phi_n = \phi_{n-1} + \frac{\omega_{y,f,n} + \omega_{y,f,n-1}}{2}\Delta t$ | Graph 3 pitch-angle trace |
+| Accelerometer longitudinal axis | Longitudinal acceleration | $\text{m/s}^2$ or g | $A_x^{(g)} = \frac{a_x}{g}$ | Graph 3 acceleration overlay and Graph 2 event context |
+| Accelerometer 3-axis vector | Gravity-reference and inertial acceleration vector | $\text{m/s}^2$ | Optional stabilized estimate: $\phi_{acc} = \text{atan2}(-a_x, \sqrt{a_y^2 + a_z^2})$ | Optional Graph 3 pitch stabilization |
+| Logger time base | Sample timing | s | $\Delta t = \frac{1}{f_s}$ and $v_n \approx \frac{W_{f,n} - W_{f,n-1}}{\Delta t}$ | Required for all histograms and rates |
 
 ---
 
 ## 12. Conclusion
 
-Section 1 of the overview defines the DAQ hardware needed to make the rest of the suspension-analysis framework mathematically and physically valid. The transition from theory to a robust measurement tool requires mitigating real-world electrical noise through ratiometric ADC measurements and preventing mathematical drift through IMU sensor fusion. When these signal processing architectures are applied, the hardware yields high-fidelity displacement, velocity, and pitch data capable of supporting professional tuning decisions.
+Section 1 of the overview defines the DAQ hardware needed to make the rest of the suspension-analysis framework mathematically and physically valid. The transition from theory to a robust measurement tool requires not only sufficient sensor range and resolution, but also practical attention to measurement stability, calibration fidelity, and IMU drift over time. Approaches such as supply-stable or ratiometric acquisition and optional IMU fusion can improve robustness, but they complement rather than replace the core calibration and time-base requirements of the framework.
