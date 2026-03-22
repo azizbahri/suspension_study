@@ -1,6 +1,6 @@
 # Suspension Study
 
-This repository contains a technical documentation set for motorcycle suspension data acquisition, signal processing, graphical interpretation, and tuning decisions.
+This repository contains a documentation set for motorcycle suspension data acquisition, signal processing, graphical interpretation, tuning decisions, and software concepts built on that theory.
 
 ## Documentation
 
@@ -12,13 +12,20 @@ Key entry points:
 
 - [doc/overview.md](doc/overview.md): Main framework document
 - [doc/README.md](doc/README.md): Documentation index and reading guide
+- [doc/software/README.md](doc/software/README.md): Software-design notes derived from the theoretical framework
 
 ## Scope
 
-The current material covers:
+The current material covers two layers.
+
+Theoretical core:
 
 - displacement translation for front and rear suspension channels,
 - velocity estimation and filtering,
 - chassis pitch-angle estimation from IMU data,
 - histogram and telemetry graph construction,
 - spring-rate, preload, compression-damping, and rebound-damping interpretation.
+
+Software-design material:
+
+- product-level DAQ visualization concepts built on the core theory.
