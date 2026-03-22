@@ -12,6 +12,7 @@ The purpose of this folder is to define how the backend, persistence layer, and 
 ## Documents
 
 - [api_contract.md](api_contract.md): Service boundaries and request-response contracts for session import, calibration, analysis, and comparison
+- [c4_architecture.md](c4_architecture.md): Pragmatic C4 view of system context, containers, and backend components for the desktop-first architecture
 - [communication_architecture.md](communication_architecture.md): How the React frontend should communicate with the Python backend in desktop-first and future cloud-capable deployments
 - [backend_data_structures.md](backend_data_structures.md): Canonical backend models and the relationships between persisted objects, derived outputs, and API payloads
 - [implementation_roadmap.md](implementation_roadmap.md): Delivery sequence that ties backend modules and frontend workflows together through MVP slices

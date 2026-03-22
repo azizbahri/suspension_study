@@ -35,6 +35,7 @@ This folder is split into three layers:
 
 - [implementation/README.md](implementation/README.md): Entry point for implementation-facing notes that convert the design into backend contracts and build phases
 - [implementation/api_contract.md](implementation/api_contract.md): Application API contract for session import, calibration, analysis, and comparison
+- [implementation/c4_architecture.md](implementation/c4_architecture.md): C4 architecture note covering system context, containers, and backend component boundaries
 - [implementation/communication_architecture.md](implementation/communication_architecture.md): Communication model between the React frontend and Python backend, including local API and future cloud options
 - [implementation/backend_data_structures.md](implementation/backend_data_structures.md): Canonical backend-side objects for sessions, profiles, validation, analysis, and comparison
 - [implementation/implementation_roadmap.md](implementation/implementation_roadmap.md): Delivery sequence for backend modules, frontend integration, and MVP slices
@@ -66,9 +67,10 @@ This folder is split into three layers:
 3. [software-design/calibration/calibration_profile_data_model.md](software-design/calibration/calibration_profile_data_model.md)
 4. [implementation/README.md](implementation/README.md)
 5. [implementation/api_contract.md](implementation/api_contract.md)
-6. [implementation/communication_architecture.md](implementation/communication_architecture.md)
-7. [implementation/backend_data_structures.md](implementation/backend_data_structures.md)
-8. [implementation/implementation_roadmap.md](implementation/implementation_roadmap.md)
+6. [implementation/c4_architecture.md](implementation/c4_architecture.md)
+7. [implementation/communication_architecture.md](implementation/communication_architecture.md)
+8. [implementation/backend_data_structures.md](implementation/backend_data_structures.md)
+9. [implementation/implementation_roadmap.md](implementation/implementation_roadmap.md)
 
 ## Legacy Index
 
