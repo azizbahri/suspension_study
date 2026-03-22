@@ -7,8 +7,10 @@ This document describes how the software should guide the user in setting up pit
 The core relation is:
 
 $$
-\phi_n = \phi_{n-1} + \frac{\omega_{y,n} + \omega_{y,n-1}}{2} \Delta t
+\phi_n = \phi_{n-1} + \frac{\omega_{y,f,n} + \omega_{y,f,n-1}}{2} \Delta t
 $$
+
+where $\omega_{y,f,n}$ is the bias-corrected (and optionally filtered) gyro rate sample about the selected pitch axis at time step $n$.
 
 ## User Goal
 
