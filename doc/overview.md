@@ -9,6 +9,8 @@ Motorcycle suspension calibration has historically relied on subjective rider fe
 
 To accurately capture the high-frequency dynamics of an off-road motorcycle, the DAQ system must meet stringent temporal and spatial resolution requirements.
 
+For a detailed explanation of the measurement architecture, sensor reasoning, hardware ranges, and formula dependencies, see [hardware_measurement_report.md](hardware_measurement_report.md).
+
 ### 1.1 Sensor Stack Specifications
 * **Linear Potentiometers (Displacement Sensors):** * *Front Fork:* 250mm stroke sensor, mounted parallel to the fork leg.
     * *Rear Shock:* 75mm to 100mm stroke sensor, mounted parallel to the rear damper body.
