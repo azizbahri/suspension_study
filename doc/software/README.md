@@ -7,6 +7,7 @@ The documents here are not part of the core derivation set. They describe how th
 ## Software Design Documents
 
 - [daq_visualization_software_report.md](daq_visualization_software_report.md): Product-level overview of a DAQ visualization application for suspension analysis and tuning support
+- [calibration_profile_workflow.md](calibration_profile_workflow.md): Detailed design note for building, validating, and maintaining calibration profiles for all derived formulas
 
 ## Relationship to the Theory Notes
 

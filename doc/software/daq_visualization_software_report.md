@@ -116,6 +116,8 @@ In practical terms, the software should guide the user through the required cons
 
 The calibration system should therefore be part of the product's core functionality, not an afterthought.
 
+The detailed software-side design of this process is covered in [calibration_profile_workflow.md](calibration_profile_workflow.md).
+
 ### 4.3 Present the Key Diagnostic Graphs
 
 The software must generate the graphs that the rest of the documentation relies on:
