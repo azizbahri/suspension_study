@@ -118,6 +118,8 @@ The calibration system should therefore be part of the product's core functional
 
 The detailed software-side design of this process is covered in [../calibration/calibration_profile_workflow.md](../calibration/calibration_profile_workflow.md).
 
+The minimum user-facing interface needed to deliver this workflow is defined in [../ui/mvp_ui_document.md](../ui/mvp_ui_document.md).
+
 ### 4.3 Present the Key Diagnostic Graphs
 
 The software must generate the graphs that the rest of the documentation relies on:
