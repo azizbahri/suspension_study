@@ -12,6 +12,7 @@ The purpose of this folder is to define how the backend, persistence layer, and 
 ## Documents
 
 - [backend/README.md](backend/README.md): Index for backend-specific implementation notes
+- [backend/api_reference.md](backend/api_reference.md): Backend API reference for implementation and later maintenance
 - [backend/overview.md](backend/overview.md): Overview of the backend components that should be implemented and how they relate to each other
 - [api_contract.md](api_contract.md): Service boundaries and request-response contracts for session import, calibration, analysis, and comparison
 - [c4_architecture.md](c4_architecture.md): Pragmatic C4 view of system context, containers, and backend components for the desktop-first architecture
