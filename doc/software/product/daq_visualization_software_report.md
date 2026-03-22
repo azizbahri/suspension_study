@@ -84,7 +84,7 @@ Once imported, the software should convert raw DAQ channels into physical values
 Examples include:
 
 $$
-W_{front} = (V_{raw} - V_{0,front}) \cdot C_{front} \cdot \cos(\theta)
+W_{front} = (V_{raw,front} - V_{0,front}) \cdot C_{front} \cdot \cos(\theta)
 $$
 
 $$

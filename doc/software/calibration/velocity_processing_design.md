@@ -7,8 +7,10 @@ This document describes how the software should help the user configure velocity
 The core relation is:
 
 $$
-v_n \approx \frac{W_n - W_{n-1}}{\Delta t}
+v_n \approx \frac{W_{f,n} - W_{f,n-1}}{\Delta t}
 $$
+
+where $W_{f,n}$ is the filtered, calibrated travel sample at index $n$; the filter configuration on this screen defines how $W_{f,n}$ is derived from raw travel $W_n$.
 
 ## User Goal
 
