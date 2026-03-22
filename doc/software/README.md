@@ -19,6 +19,7 @@ The software documents are organized into subdirectories so product design and c
 
 - [calibration/README.md](calibration/README.md): Calibration-design notes index
 - [calibration/calibration_profile_workflow.md](calibration/calibration_profile_workflow.md): Detailed design note for building, validating, and maintaining calibration profiles for all derived formulas
+- [calibration/calibration_profile_data_model.md](calibration/calibration_profile_data_model.md): Calibration profile schema, validity-state model, provenance fields, and revision metadata
 - [calibration/front_travel_calibration_design.md](calibration/front_travel_calibration_design.md): Front calibration screen and workflow design
 - [calibration/rear_travel_calibration_design.md](calibration/rear_travel_calibration_design.md): Rear calibration and linkage screen design
 - [calibration/velocity_processing_design.md](calibration/velocity_processing_design.md): Velocity setup, filtering, and validation design
