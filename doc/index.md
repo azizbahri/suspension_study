@@ -1,9 +1,10 @@
 # Suspension DAQ Documentation Index
 
-This directory contains two categories of material:
+This directory contains three categories of material:
 
 - theoretical notes that define the measurement, signal-processing, and tuning framework,
-- software-design notes that describe applications built on that framework.
+- software-design notes that describe applications built on that framework,
+- implementation-facing notes that describe how the product should actually be assembled.
 
 ## Primary Document
 
@@ -27,6 +28,14 @@ This directory contains two categories of material:
 - [software/product/daq_visualization_software_report.md](software/product/daq_visualization_software_report.md): Product overview of a visualization tool that imports DAQ logs, generates the main analysis graphs, and supports tuning decisions.
 - [software/calibration/calibration_profile_workflow.md](software/calibration/calibration_profile_workflow.md): Calibration workflow for building and validating the constants behind the analysis formulas.
 
+## Implementation Notes
+
+- [implementation/README.md](implementation/README.md): Entry point for backend contract, data-structure, and delivery-planning notes.
+- [implementation/api_contract.md](implementation/api_contract.md): Service contract for session import, calibration, analysis, and comparison.
+- [implementation/communication_architecture.md](implementation/communication_architecture.md): Communication model for a React frontend and Python backend in local and future remote deployment.
+- [implementation/backend_data_structures.md](implementation/backend_data_structures.md): Canonical backend object model used across persistence and API layers.
+- [implementation/implementation_roadmap.md](implementation/implementation_roadmap.md): Recommended build sequence and MVP slicing strategy.
+
 ## Recommended Reading Order
 
 1. [overview.md](overview.md)
@@ -46,3 +55,14 @@ This directory contains two categories of material:
 3. [software/index.md](software/index.md)
 4. [software/product/daq_visualization_software_report.md](software/product/daq_visualization_software_report.md)
 5. [software/calibration/calibration_profile_workflow.md](software/calibration/calibration_profile_workflow.md)
+
+## Implementation Reading Order
+
+1. [software/product/daq_visualization_software_report.md](software/product/daq_visualization_software_report.md)
+2. [software/calibration/calibration_profile_workflow.md](software/calibration/calibration_profile_workflow.md)
+3. [software/calibration/calibration_profile_data_model.md](software/calibration/calibration_profile_data_model.md)
+4. [implementation/README.md](implementation/README.md)
+5. [implementation/api_contract.md](implementation/api_contract.md)
+6. [implementation/communication_architecture.md](implementation/communication_architecture.md)
+7. [implementation/backend_data_structures.md](implementation/backend_data_structures.md)
+8. [implementation/implementation_roadmap.md](implementation/implementation_roadmap.md)

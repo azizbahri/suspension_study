@@ -1,9 +1,10 @@
 # Suspension DAQ Documentation
 
-This folder is split into two layers:
+This folder is split into three layers:
 
 - the theoretical core of the suspension-analysis framework,
-- software-design documents that describe how the framework could be turned into a user-facing product.
+- software-design documents that describe how the framework could be turned into a user-facing product,
+- implementation-facing documents that define backend contracts, data structures, and delivery sequencing.
 
 ## Start Here
 
@@ -27,6 +28,14 @@ This folder is split into two layers:
 - [software/product/daq_visualization_software_report.md](software/product/daq_visualization_software_report.md): Product overview for a DAQ visualization application built on the theoretical framework
 - [software/calibration/calibration_profile_workflow.md](software/calibration/calibration_profile_workflow.md): Calibration-profile workflow for all derived formulas
 
+## Implementation Planning
+
+- [implementation/README.md](implementation/README.md): Entry point for implementation-facing notes that convert the design into backend contracts and build phases
+- [implementation/api_contract.md](implementation/api_contract.md): Application API contract for session import, calibration, analysis, and comparison
+- [implementation/communication_architecture.md](implementation/communication_architecture.md): Communication model between the React frontend and Python backend, including local API and future cloud options
+- [implementation/backend_data_structures.md](implementation/backend_data_structures.md): Canonical backend-side objects for sessions, profiles, validation, analysis, and comparison
+- [implementation/implementation_roadmap.md](implementation/implementation_roadmap.md): Delivery sequence for backend modules, frontend integration, and MVP slices
+
 ## Suggested Reading Order
 
 1. [overview.md](overview.md)
@@ -46,6 +55,17 @@ This folder is split into two layers:
 3. [software/index.md](software/index.md)
 4. [software/product/daq_visualization_software_report.md](software/product/daq_visualization_software_report.md)
 5. [software/calibration/calibration_profile_workflow.md](software/calibration/calibration_profile_workflow.md)
+
+## Implementation Reading Path
+
+1. [software/product/daq_visualization_software_report.md](software/product/daq_visualization_software_report.md)
+2. [software/calibration/calibration_profile_workflow.md](software/calibration/calibration_profile_workflow.md)
+3. [software/calibration/calibration_profile_data_model.md](software/calibration/calibration_profile_data_model.md)
+4. [implementation/README.md](implementation/README.md)
+5. [implementation/api_contract.md](implementation/api_contract.md)
+6. [implementation/communication_architecture.md](implementation/communication_architecture.md)
+7. [implementation/backend_data_structures.md](implementation/backend_data_structures.md)
+8. [implementation/implementation_roadmap.md](implementation/implementation_roadmap.md)
 
 ## Legacy Index
 
