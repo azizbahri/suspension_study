@@ -16,6 +16,7 @@ The software material is separated into two main design tracks:
 
 - [calibration/README.md](calibration/README.md): Index for calibration-related software notes
 - [calibration/calibration_profile_workflow.md](calibration/calibration_profile_workflow.md): End-to-end workflow for creating and validating calibration profiles
+- [calibration/calibration_profile_data_model.md](calibration/calibration_profile_data_model.md): Calibration profile schema, validity-state model, and provenance fields
 - [calibration/front_travel_calibration_design.md](calibration/front_travel_calibration_design.md): Front travel calibration screen and workflow design
 - [calibration/rear_travel_calibration_design.md](calibration/rear_travel_calibration_design.md): Rear travel and linkage calibration screen and workflow design
 - [calibration/velocity_processing_design.md](calibration/velocity_processing_design.md): Velocity setup, filtering, and validation design
@@ -25,7 +26,8 @@ The software material is separated into two main design tracks:
 
 1. [product/daq_visualization_software_report.md](product/daq_visualization_software_report.md)
 2. [calibration/calibration_profile_workflow.md](calibration/calibration_profile_workflow.md)
-3. [calibration/front_travel_calibration_design.md](calibration/front_travel_calibration_design.md)
-4. [calibration/rear_travel_calibration_design.md](calibration/rear_travel_calibration_design.md)
-5. [calibration/velocity_processing_design.md](calibration/velocity_processing_design.md)
-6. [calibration/pitch_processing_design.md](calibration/pitch_processing_design.md)
+3. [calibration/calibration_profile_data_model.md](calibration/calibration_profile_data_model.md)
+4. [calibration/front_travel_calibration_design.md](calibration/front_travel_calibration_design.md)
+5. [calibration/rear_travel_calibration_design.md](calibration/rear_travel_calibration_design.md)
+6. [calibration/velocity_processing_design.md](calibration/velocity_processing_design.md)
+7. [calibration/pitch_processing_design.md](calibration/pitch_processing_design.md)

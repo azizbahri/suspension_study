@@ -10,6 +10,8 @@ This document defines how the software should help a user create, validate, and 
 
 The calibration profile stores the constants, conventions, and validation state required to turn logged DAQ signals into engineering quantities.
 
+The data structure that holds those fields is defined in [calibration_profile_data_model.md](calibration_profile_data_model.md).
+
 At a minimum, the software uses the calibration profile to support:
 
 $$
