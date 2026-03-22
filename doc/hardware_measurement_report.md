@@ -2,7 +2,7 @@
 
 ## Abstract
 
-This report expands Section 1 of [overview.md](overview.md) by explaining what the required DAQ hardware means in practical engineering terms. The objective is to clarify why each sensor is needed, what physical quantity it measures, how its range and resolution affect the later calculations, and which minimum set of measurements is required to construct the plots and formulas used throughout the suspension-analysis framework. Rather than treating Section 1 as only a hardware list, this report treats it as the measurement architecture that makes the rest of the document possible.
+This report expands Section 1 of [overview.md](overview.md) by explaining what the required DAQ hardware means in practical engineering terms. The objective is to clarify why each sensor is needed, what physical quantity it measures, how its range and resolution affect the later calculations, and which minimum set of measurements is required to construct the plots and formulas used throughout the suspension-analysis framework. Crucially, it addresses the real-world signal processing requirements—such as ratiometric ADC measurement and sensor fusion—necessary to transition from theoretical physics to a functional, noise-resistant product architecture.
 
 ---
 
@@ -13,17 +13,17 @@ Section 1 of the overview defines the data-acquisition stack required to turn su
 At a high level, the DAQ system must provide four things:
 
 1. suspension displacement,
-2. angular-rate data for pitch estimation,
+2. angular-rate and acceleration data for fused pitch estimation,
 3. acceleration data for impact and braking context,
 4. a time base with enough sampling rate to resolve high-speed suspension events.
 
 The measurement chain can be summarized as
 
 $$
-\text{Sensors} \rightarrow \text{DAQ channels} \rightarrow \text{calibrated physical variables} \rightarrow \text{plots and tuning decisions}
+\text{Sensors} \rightarrow \text{DAQ channels} \rightarrow \text{Signal Processing (Filtering/Fusion)} \rightarrow \text{calibrated physical variables} \rightarrow \text{plots and tuning decisions}
 $$
 
-Everything in the later sections depends on the quality of this chain.
+Everything in the later sections depends on the quality and stability of this chain.
 
 ---
 
@@ -38,9 +38,7 @@ Section 1 is specifying the minimum hardware required to measure the state varia
 - longitudinal acceleration,
 - ride-time distributions in travel and velocity space.
 
-In other words, the hardware section is really defining the observability of the system. If a required signal is not measured with adequate range, adequate resolution, or adequate sample rate, then the later mathematical framework becomes unreliable.
-
-The hardware therefore has to be chosen by working backward from the later equations.
+If a required signal is not measured with adequate range, adequate resolution, adequate stability, or adequate sample rate, then the later mathematical framework becomes unreliable. 
 
 ---
 
@@ -57,7 +55,7 @@ Needed for:
 - front velocity estimation,
 - front compression and rebound interpretation.
 
-This channel is used in the front travel model
+This channel is used in the front travel model:
 
 $$
 W_{front,n} = (V_{front,n} - V_{0,front}) \cdot C_{front} \cdot \cos(\theta)
@@ -73,7 +71,7 @@ Needed for:
 - rear velocity estimation,
 - rear packing and rebound analysis.
 
-This channel is used in the rear travel model
+This channel is used in the rear travel model:
 
 $$
 s_{rear,n} = (V_{rear,n} - V_{0,rear}) \cdot C_{rear}
@@ -83,21 +81,21 @@ $$
 W_{rear,n} = a s_{rear,n}^2 + b s_{rear,n} + c
 $$
 
-### 3.3 Gyroscope Pitch-Rate Channel
+### 3.3 IMU Sensor Fusion Channels (Gyro & Accel for Pitch)
 
 Needed for:
 
-- pitch-angle estimation,
+- stable pitch-angle estimation,
 - brake-dive interpretation,
 - chassis load-transfer analysis.
 
-This channel is used in
+Unlike pure integration, a stable pitch channel requires fusing the gyroscope rate ($\omega_y$) with the accelerometer gravity vector ($\phi_{acc}$):
 
 $$
-\phi_n = \phi_{n-1} + \frac{\omega_{y,f,n} + \omega_{y,f,n-1}}{2} \Delta t
+\phi_n = \alpha \cdot (\phi_{n-1} + \omega_{y,n} \cdot \Delta t) + (1 - \alpha) \cdot \phi_{acc,n}
 $$
 
-### 3.4 Accelerometer Channel
+### 3.4 Accelerometer Channel (Longitudinal & Vertical)
 
 Needed for:
 
@@ -105,7 +103,7 @@ Needed for:
 - braking and acceleration context,
 - overlay in the pitch telemetry graph.
 
-This is used in
+This is used in:
 
 $$
 A_{x,n}^{(g)} = \frac{a_{x,n}}{g}
@@ -115,19 +113,17 @@ $$
 
 Needed for all derivatives, all integrations, and all time-domain plots.
 
-With sampling rate $f_s$,
+With sampling rate $f_s$:
 
 $$
 \Delta t = \frac{1}{f_s}
 $$
 
-and time samples are
+and time samples are:
 
 $$
 t_n = n\Delta t
 $$
-
-Without this time base, neither the velocity calculation nor the pitch-angle integration can be performed.
 
 ---
 
@@ -137,7 +133,7 @@ The overview specifies front and rear linear potentiometers because suspension a
 
 ### 4.1 What They Measure
 
-A linear potentiometer converts mechanical stroke into voltage. If the potentiometer output range is 0 to 5 V, then the measured voltage is mapped to stroke through calibration. In general form,
+A linear potentiometer acts as a voltage divider, converting mechanical stroke into an electrical signal. In an ideal general form:
 
 $$
 s = (V_{raw} - V_0) \cdot C_{cal}
@@ -149,95 +145,35 @@ where:
 - $V_0$ is the zero offset,
 - $C_{cal}$ is the calibration constant in mm/V.
 
+*Note: In practice, converting this voltage requires specific electrical architectures to prevent noise from ruining the derivative calculations (see Section 5.4).*
+
 ### 4.2 Why a Front Sensor Is Required
 
-The front potentiometer is required because the fork position is the basis for:
-
-- front travel percentage,
-- front velocity histogram,
-- brake-dive interpretation when combined with pitch data.
-
-If the front channel is missing, then the framework cannot quantify fork support, dive, or compression and rebound behavior at the front end.
+The front potentiometer is required because the fork position is the basis for front travel percentage, front velocity histograms, and brake-dive interpretation.
 
 ### 4.3 Why a Rear Sensor Is Required
 
-The rear potentiometer is required because the rear shock or linkage motion is the basis for:
-
-- rear travel percentage,
-- rear velocity histogram,
-- packing and kickback interpretation,
-- rear balance relative to the front.
-
-Because the rear linkage is non-linear, the rear sensor is especially important. Rear behavior cannot be inferred reliably from front measurements alone.
-
-### 4.4 Why the Stated Stroke Lengths Make Sense
-
-The overview specifies:
-
-- 250 mm stroke for the front,
-- 75 mm to 100 mm stroke for the rear shock.
-
-This is a geometric requirement. The sensor must span the full expected motion of the component it is attached to without saturating. If the sensor bottoms internally before the suspension bottoms mechanically, the measurement becomes useless near the most important part of the stroke.
-
-Thus the sensor stroke length must satisfy
-
-$$
-s_{sensor,max} > s_{mechanism,max}
-$$
-
-with additional margin for mounting tolerances and dynamic overtravel.
+The rear potentiometer is required because the rear shock or linkage motion is the basis for rear travel percentage, velocity histograms, and packing analysis. Because the rear linkage is non-linear, the rear sensor is especially important.
 
 ---
 
-## 5. ADC Resolution: Why 12-Bit or 16-Bit Matters
+## 5. ADC Resolution and Electrical Architecture
 
 The overview specifies an analog voltage output converted through a 12-bit or 16-bit ADC. This requirement exists because displacement resolution depends directly on voltage resolution.
 
-### 5.1 Voltage Resolution
+### 5.1 Ideal Voltage Resolution
 
-If the ADC full-scale range is $V_{ref}$ and the converter has $N$ bits, then the voltage resolution is approximately
+If the ADC full-scale range is $V_{ref}$ and the converter has $N$ bits, then the voltage resolution is approximately:
 
 $$
 \Delta V = \frac{V_{ref}}{2^N - 1}
 $$
 
-For a 0 to 5 V system:
-
-$$
-\Delta V_{12} = \frac{5}{4095} \approx 1.22 \text{ mV}
-$$
-
-$$
-\Delta V_{16} = \frac{5}{65535} \approx 0.076 \text{ mV}
-$$
+For a 0 to 5 V system, $\Delta V_{12} \approx 1.22 \text{ mV}$ and $\Delta V_{16} \approx 0.076 \text{ mV}$.
 
 ### 5.2 Displacement Resolution
 
-If the sensor calibration constant is $C_{cal}$ in mm/V, then the theoretical displacement resolution is
-
-$$
-\Delta s = C_{cal} \Delta V
-$$
-
-As an illustrative example, if a 250 mm front sensor spans 0 to 5 V, then
-
-$$
-C_{front} = \frac{250}{5} = 50 \text{ mm/V}
-$$
-
-so the 12-bit displacement resolution is approximately
-
-$$
-\Delta s_{12} = 50 \cdot 0.00122 \approx 0.061 \text{ mm}
-$$
-
-and the 16-bit resolution is approximately
-
-$$
-\Delta s_{16} = 50 \cdot 0.000076 \approx 0.0038 \text{ mm}
-$$
-
-These are ideal quantization values, but they show why higher ADC resolution improves the fidelity of the later derivative calculation.
+If the sensor calibration constant is $C_{cal}$ in mm/V, then the theoretical displacement resolution is $\Delta s = C_{cal} \Delta V$. Higher ADC resolution fundamentally improves the fidelity of the displacement signal.
 
 ### 5.3 Why Resolution Matters for Velocity
 
@@ -247,264 +183,112 @@ $$
 v_n \approx \frac{W_{f,n} - W_{f,n-1}}{\Delta t}
 $$
 
-If the displacement channel is too coarse, the velocity histogram becomes noisy and unreliable. That is the real reason ADC resolution matters in this application.
+If the displacement channel is too coarse, the velocity histogram becomes noisy and unusable. 
+
+### 5.4 The Ratiometric Measurement Mandate (Critical Fix)
+
+Motorcycle electrical systems are incredibly noisy. If the 5V supply to the linear potentiometer drops by just 50mV due to the radiator fan turning on, an absolute ADC measurement will register a sudden drop in $V_{raw}$. The mathematical framework will interpret this voltage drop as a massive suspension movement, resulting in a severe, artificial velocity spike ($v > 500 \text{ mm/s}$) that ruins the data.
+
+To prevent this, the DAQ must use **Ratiometric Measurement**. The ADC reference voltage ($V_{ref}$) and the potentiometer supply voltage must be the exact same electrical trace. Therefore, any fluctuation in the supply voltage causes an equal fluctuation in the ADC reference, cancelling out the error. 
+
+Instead of measuring absolute voltage, the firmware maps raw ADC counts directly to stroke:
+
+$$
+s_{n} = \left( \frac{\text{ADC}_{raw,n}}{2^N - 1} \right) \cdot s_{max}
+$$
 
 ---
 
-## 6. IMU: Why a 6-Axis Unit Is Required
+## 6. IMU: Why a 6-Axis Unit and Sensor Fusion Are Required
 
-The overview specifies a 6-axis IMU because the framework needs both acceleration and angular-rate information.
+The overview specifies a 6-axis IMU because the framework needs both acceleration and angular-rate information to establish chassis attitude.
 
 ### 6.1 Why an Accelerometer Is Needed
 
-The accelerometer provides the inertial context for the suspension events. It answers questions such as:
+The accelerometer provides the inertial context for the suspension events (e.g., was a suspension spike due to a rock, or from hard braking?). It answers how severe the load transfer or chassis input was.
 
-- was a spike due to a harsh impact,
-- was the bike under braking,
-- how severe was the load transfer or chassis input.
+### 6.2 The Flaw of Pure Gyroscope Integration
 
-This is essential for interpreting Graph 2 and Graph 3 correctly. A fast compression event is not enough information by itself. The accelerometer helps determine whether the event corresponds to braking, acceleration, or terrain impact.
-
-### 6.2 Why a Gyroscope Is Needed
-
-The gyroscope is required because pitch angle is not directly measured by the potentiometers. It is estimated by integrating the pitch-rate channel:
+A naive approach to calculating chassis pitch ($\phi$) simply integrates the Y-axis gyroscope data over time:
 
 $$
-\phi(t) = \phi(0) + \int_0^t \omega_{y,f}(\tau) \, d\tau
+\phi_{drift}(t) = \int_{0}^{t} (\omega_y(\tau) + \text{bias}) \, d\tau
 $$
 
-Without the gyroscope, the framework loses its direct measure of chassis rotation and therefore loses one of its strongest indicators of brake dive and load transfer.
+**The Reality:** Due to thermal noise and microscopic sensor bias, pure integration results in an *unbounded random walk*. Within 60 seconds of riding, the software will calculate that the motorcycle is doing a backflip, even if it is parked. Pure integration cannot be used in a real-world product.
 
-### 6.3 Why the IMU Should Be Near the Center of Gravity
+### 6.3 Sensor Fusion: The Complementary Filter Architecture
 
-Mounting the IMU near the center of gravity reduces the contamination of the accelerometer signals by rotational leverage and structural vibration. The closer the sensor is to the chassis' representative rigid-body motion, the easier it is to interpret acceleration and pitch-rate data as actual vehicle-state information rather than local frame motion.
+To achieve stable, drift-free pitch estimation, the DAQ must employ **Sensor Fusion**. The most efficient method for a microcontroller is a Complementary Filter. This acts as a high-pass filter on the integrated gyroscope (trusting it for fast, short-term movements like brake dive) and a low-pass filter on the accelerometer (trusting its gravity vector for long-term absolute levelness).
+
+First, calculate the absolute pitch from the accelerometer's gravity vector:
+$$
+\phi_{acc} = \text{atan2}(-a_x, \sqrt{a_y^2 + a_z^2})
+$$
+
+Next, fuse this with the gyroscope using a tuning parameter $\alpha$ (typically 0.95 to 0.99):
+$$
+\phi_n = \alpha \cdot (\phi_{n-1} + \omega_{y,n} \cdot \Delta t) + (1 - \alpha) \cdot \phi_{acc,n}
+$$
+
+*(Note: During hard longitudinal acceleration or braking where total $G \neq 1g$, the firmware dynamically forces $\alpha \to 0.999$ to ignore the corrupted accelerometer data).*
 
 ---
 
 ## 7. Why the Accelerometer Range Must Be at Least $\pm 16g$
 
-The overview specifies a minimum accelerometer range of $\pm 16g$ to capture harsh bottom-out impacts. This is a dynamic-range requirement.
-
-If the maximum real acceleration exceeds the accelerometer range, the sensor saturates:
-
-$$
-\lvert a_{meas} \rvert > a_{range,max} \Rightarrow \text{clipping}
-$$
-
-Once clipping occurs, the recorded impact amplitude is no longer trustworthy. Since harshness diagnosis in Section 4.2 explicitly relies on IMU spike magnitude, saturation would undermine that interpretation.
-
-Thus the accelerometer range must be large enough to preserve the peaks associated with off-road impacts and bottoming events.
+A minimum accelerometer range of $\pm 16g$ is required to capture harsh bottom-out impacts. If the maximum real acceleration exceeds the accelerometer range, the sensor saturates (clips). Once clipping occurs, harshness diagnosis becomes impossible. 
 
 ---
 
 ## 8. Why the Gyroscope Range Must Be at Least $\pm 500^\circ/s$
 
-The overview specifies a minimum gyroscope range of $\pm 500^\circ/s$ to capture pitch and roll rates. This is also a dynamic-range requirement.
-
-If the chassis rotates faster than the gyroscope can represent, then the pitch-rate measurement clips:
-
-$$
-\lvert \omega_{meas} \rvert > \omega_{range,max} \Rightarrow \text{clipping}
-$$
-
-Since pitch angle is obtained by integrating pitch rate, clipped rate data causes immediate corruption of the angle estimate. For braking events, jumps, and abrupt attitude changes, adequate rate range is essential.
+A minimum gyroscope range of $\pm 500^\circ/s$ is required. If the chassis rotates faster than the gyroscope can represent during a jump or crash, the measurement clips. Because pitch angle relies on gyroscope data in the short term, clipped rate data causes immediate corruption of the angle estimate.
 
 ---
 
-## 9. Why the Logger Must Sample at 250 Hz
+## 9. Why the Logger Must Sample at 250 Hz (Minimum)
 
-The overview specifies a minimum sample rate of 250 Hz, corresponding to a sample interval of
-
-$$
-\Delta t = \frac{1}{250} = 0.004 \text{ s}
-$$
+The overview specifies a minimum sample rate of 250 Hz ($\Delta t = 0.004 \text{ s}$).
 
 ### 9.1 Why Time Resolution Matters
 
-Suspension events can evolve very quickly, especially sharp impacts. If the sample interval is too large, then fast events are under-sampled and the resulting displacement, velocity, and IMU traces are distorted.
+If a motorcycle hits a square-edged rock at 20 m/s, the wheel moves 80 mm horizontally between 250 Hz samples. Slower sampling rates will completely miss the peak velocity of the damping spike. (For high-end diagnostic products, 500 Hz to 1000 Hz is preferred).
 
-### 9.2 Nyquist Reasoning
+### 9.2 Zero-Phase Filtering Requirement
 
-To avoid aliasing, the sample rate must exceed twice the highest frequency of interest:
-
-$$
-f_s > 2 f_{max}
-$$
-
-This is the Nyquist criterion. The overview's 250 Hz requirement is a practical engineering choice intended to capture high-speed damping events while preserving acceptable time resolution for filtering and differentiation.
-
-### 9.3 Why Sample Rate Matters for Velocity
-
-Velocity estimation depends on finite differences over the sample interval:
-
-$$
-v_n \approx \frac{W_{f,n} - W_{f,n-1}}{\Delta t}
-$$
-
-If $\Delta t$ is too large, then:
-
-- peak velocities are blurred,
-- narrow impact events are missed,
-- histogram distributions are smeared,
-- derivative error increases.
-
-Thus the sample rate is not just a logging convenience. It directly affects the quality of the damping analysis.
+Because velocity is calculated via a finite difference ($v_n \approx \frac{W_{f,n} - W_{f,n-1}}{\Delta t}$), high-frequency noise is severely amplified. While a standard low-pass Butterworth filter cleans this noise, it introduces *group delay* (phase shift), making the velocity peak appear artificially late compared to the IMU G-spike. The software architecture must utilize **Zero-Phase Filtering** (forward-backward filtering) during post-processing to keep the time-domains perfectly aligned.
 
 ---
 
 ## 10. What Measurements Are Needed for Each Plot
 
-Section 3 of the overview defines three primary graphs. Each one depends on a specific measurement set.
-
 ### 10.1 Graph 1: Position or Travel Histogram
-
-Required measurements:
-
-- front or rear displacement sensor voltage,
-- calibration constants and offsets,
-- total available wheel travel.
-
-Derived variable:
-
-$$
-P_n = 100 \cdot \frac{W_n}{W_{max}}
-$$
-
-This graph cannot be built without calibrated displacement.
+* **Required:** Ratiometric displacement ADC counts, calibration constants, total available wheel travel.
+* **Derived:** $P_n = 100 \cdot \frac{W_n}{W_{max}}$
 
 ### 10.2 Graph 2: Velocity Histogram
-
-Required measurements:
-
-- displacement channel,
-- sampling interval,
-- filtered displacement signal,
-- optionally IMU acceleration for event interpretation.
-
-Derived variable:
-
-$$
-v_n \approx \frac{W_{f,n} - W_{f,n-1}}{\Delta t}
-$$
-
-This graph cannot be built without both displacement and an adequate time base.
+* **Required:** Filtered displacement channel, accurate $\Delta t$.
+* **Derived:** $v_n \approx \frac{W_{f,n} - W_{f,n-1}}{\Delta t}$
 
 ### 10.3 Graph 3: Pitch Angle Versus Time
-
-Required measurements:
-
-- gyroscope pitch-rate channel,
-- accelerometer longitudinal channel,
-- sampling interval,
-- bias estimate and filtering parameters.
-
-Derived variables:
-
-$$
-\phi_n = \phi_{n-1} + \frac{\omega_{y,f,n} + \omega_{y,f,n-1}}{2} \Delta t
-$$
-
-$$
-A_{x,n}^{(g)} = \frac{a_{x,n}}{g}
-$$
-
-This graph cannot be built reliably without both the gyroscope and accelerometer.
+* **Required:** Gyroscope Y-axis, Accelerometer X/Y/Z axes, sample interval, sensor fusion algorithm.
+* **Derived:** $\phi_n = \alpha \cdot (\phi_{n-1} + \omega_{y,n} \cdot \Delta t) + (1 - \alpha) \cdot \phi_{acc,n}$
 
 ---
 
-## 11. What Measurements Are Needed for Each Main Formula
+## 11. Sensor-Channel Summary Table
 
-The core mathematical framework can be mapped directly to hardware measurements.
-
-### 11.1 Front Travel Formula
-
-$$
-W_{front} = (V_{raw} - V_{0,front}) \cdot C_{front} \cdot \cos(\theta)
-$$
-
-Required inputs:
-
-- front potentiometer voltage,
-- front zero offset,
-- front calibration constant,
-- fork angle.
-
-### 11.2 Rear Travel Formula
-
-$$
-s_{rear} = (V_{raw,rear} - V_{0,rear}) \cdot C_{rear}
-$$
-
-$$
-W_{rear}(s_{rear}) = a s_{rear}^2 + b s_{rear} + c
-$$
-
-Required inputs:
-
-- rear potentiometer voltage,
-- rear zero offset,
-- rear calibration constant,
-- bike-specific linkage constants.
-
-### 11.3 Velocity Formula
-
-$$
-v_n \approx \frac{W_{f,n} - W_{f,n-1}}{\Delta t}
-$$
-
-Required inputs:
-
-- filtered displacement,
-- sample rate or sample interval.
-
-### 11.4 Pitch Formula
-
-$$
-\phi(t) = \phi(0) + \int_0^t \omega_{y,f}(\tau) \, d\tau
-$$
-
-Required inputs:
-
-- gyroscope pitch-rate channel,
-- bias correction,
-- filtering,
-- time base.
+| Channel | Measured Quantity | Primary Formula Dependencies | Primary Plot Dependencies |
+| --- | --- | --- | --- |
+| Front potentiometer | ADC Count (Ratiometric) | $s_{front} = \left( \frac{\text{ADC}}{2^N - 1} \right) \cdot s_{max}$ | Graph 1 & 2 front histograms |
+| Rear potentiometer | ADC Count (Ratiometric) | $W_{rear} = a s_{rear}^2 + b s_{rear} + c$ | Graph 1 & 2 rear histograms |
+| Gyroscope Y-axis | Pitch rate ($\omega_y$) | $\phi_n$ (Short-term fusion component) | Graph 3 pitch-angle trace |
+| Accelerometer X/Y/Z | Gravity vector & Impact Gs | $\phi_{acc} = \text{atan2}(-a_x, \sqrt{a_y^2 + a_z^2})$ | Graph 3 pitch correction & Graph 2 context |
+| Logger time base | Sample timing | $v_n \approx \frac{W_{f,n} - W_{f,n-1}}{\Delta t}$ | Required for all histograms and rates |
 
 ---
 
-## 12. Practical Interpretation of the Hardware Stack
+## 12. Conclusion
 
-If the hardware stack is incomplete, the later framework becomes incomplete in specific ways:
-
-- no displacement sensor means no travel or velocity histogram,
-- no gyroscope means no pitch-angle trace,
-- no accelerometer means poor impact and braking context,
-- no adequate sample rate means unreliable derivatives and aliasing,
-- no adequate ADC resolution means noisy displacement and therefore noisy velocity.
-
-This is why Section 1 must be understood as a technical requirement definition rather than a generic parts list.
-
----
-
-## 13. Sensor-Channel Summary Table
-
-The following table condenses the minimum measurement set into a GitHub-friendly reference format.
-
-| Channel | Measured Quantity | Typical Unit | Primary Formula Dependencies | Primary Plot Dependencies |
-| --- | --- | --- | --- | --- |
-| Front potentiometer | Front fork displacement voltage | V | $W_{front} = (V_{front} - V_{0,front}) \cdot C_{front} \cdot \cos(\theta)$ | Graph 1 front travel histogram, Graph 2 front velocity histogram |
-| Rear potentiometer | Rear shock displacement voltage | V | $s_{rear} = (V_{rear} - V_{0,rear}) \cdot C_{rear}$ and $W_{rear} = a s_{rear}^2 + b s_{rear} + c$ | Graph 1 rear travel histogram, Graph 2 rear velocity histogram |
-| ADC sample from displacement channels | Quantized sensor voltage | counts or V | $\Delta V = \frac{V_{ref}}{2^N - 1}$ and $\Delta s = C_{cal}\Delta V$ | Affects fidelity of Graph 1 and Graph 2 via displacement and derivative quality |
-| Gyroscope Y-axis | Pitch rate | deg/s or rad/s | $\phi_n = \phi_{n-1} + \frac{\omega_{y,f,n} + \omega_{y,f,n-1}}{2}\Delta t$ | Graph 3 pitch-angle trace |
-| Accelerometer longitudinal axis | Longitudinal acceleration | $\text{m/s}^2$ or g | $A_{x}^{(g)} = \frac{a_x}{g}$ | Graph 3 acceleration overlay, Graph 2 impact and braking interpretation |
-| Logger time base | Sample timing | s | $\Delta t = \frac{1}{f_s}$, $t_n = n\Delta t$, $v_n \approx \frac{W_{f,n} - W_{f,n-1}}{\Delta t}$ | Required for Graph 2 and Graph 3, and for histogram time-percentage calculations |
-
-This table is the compact version of the hardware argument made throughout the report: each channel exists because a later physical variable, formula, or graph depends on it directly.
-
----
-
-## 14. Conclusion
-
-Section 1 of the overview defines the DAQ hardware needed to make the rest of the suspension-analysis framework mathematically and physically valid. The front and rear linear potentiometers provide the displacement channels required for wheel travel and velocity calculations. The IMU provides the angular-rate and acceleration channels required for pitch-angle estimation, braking interpretation, and harshness identification. The ADC resolution defines how finely the analog sensor voltages can be resolved, and the logger sample rate defines whether high-speed suspension events can be captured without aliasing.
-
-The later plots and formulas are therefore direct consequences of the measurement hardware. The hardware is not auxiliary to the framework. It is the foundation that determines whether the framework can be executed with sufficient fidelity to support real tuning decisions.
+Section 1 of the overview defines the DAQ hardware needed to make the rest of the suspension-analysis framework mathematically and physically valid. The transition from theory to a robust measurement tool requires mitigating real-world electrical noise through ratiometric ADC measurements and preventing mathematical drift through IMU sensor fusion. When these signal processing architectures are applied, the hardware yields high-fidelity displacement, velocity, and pitch data capable of supporting professional tuning decisions.
