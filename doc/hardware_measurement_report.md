@@ -20,7 +20,7 @@ At a high level, the DAQ system must provide four things:
 The measurement chain can be summarized as
 
 $$
-	ext{Sensors} \rightarrow \text{DAQ channels} \rightarrow \text{Signal Conditioning and Optional Fusion} \rightarrow \text{calibrated physical variables} \rightarrow \text{plots and tuning decisions}
+	\text{Sensors} \rightarrow \text{DAQ channels} \rightarrow \text{Signal Conditioning and Optional Fusion} \rightarrow \text{calibrated physical variables} \rightarrow \text{plots and tuning decisions}
 $$
 
 Everything in the later sections depends on the quality, stability, and calibration of this chain.
@@ -100,8 +100,10 @@ $$
 In practical systems, long-horizon pitch stability may be improved by combining gyroscope integration with an accelerometer-derived attitude estimate. One common low-cost implementation is a complementary filter:
 
 $$
-\phi_n = \alpha \cdot (\phi_{n-1} + \omega_{y,n} \cdot \Delta t) + (1 - \alpha) \cdot \phi_{acc,n}
+\phi_n = \alpha \cdot (\phi_{n-1} + \omega_{y,f,n} \cdot \Delta t) + (1 - \alpha) \cdot \phi_{acc,n}
 $$
+
+Here, $\omega_{y,f,n}$ denotes the bias-corrected/filtered gyroscope pitch-rate sample at time index $n$.
 
 ### 3.4 Accelerometer Channel
 
@@ -239,7 +241,7 @@ $$
 
 Next, fuse this with the gyroscope using a tuning parameter $\alpha$ (typically 0.95 to 0.99):
 $$
-\phi_n = \alpha \cdot (\phi_{n-1} + \omega_{y,n} \cdot \Delta t) + (1 - \alpha) \cdot \phi_{acc,n}
+\phi_n = \alpha \cdot (\phi_{n-1} + \omega_{y,f,n} \cdot \Delta t) + (1 - \alpha) \cdot \phi_{acc,n}
 $$
 
 During hard longitudinal acceleration or braking, accelerometer-derived pitch becomes less trustworthy because the accelerometer is measuring both gravity and linear acceleration. In those conditions, practical implementations often increase the gyroscope weighting, but the exact adaptation logic is firmware-specific and should be treated as a design choice rather than a universal requirement.
