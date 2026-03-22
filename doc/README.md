@@ -1,12 +1,15 @@
 # Suspension DAQ Documentation
 
-This folder contains the main framework document and the supporting technical notes that expand the mathematical derivations, graph construction, and tuning logic.
+This folder is split into two layers:
+
+- the theoretical core of the suspension-analysis framework,
+- software-design documents that describe how the framework could be turned into a user-facing product.
 
 ## Start Here
 
 - [overview.md](overview.md): Main DAQ framework, equations, graph definitions, and tuning workflow
 
-## Technical Notes
+## Theoretical Core
 
 - [hardware_measurement_report.md](hardware_measurement_report.md): Hardware architecture, sensor roles, required measurements, ADC resolution, and logger sample-rate reasoning
 - [displacement_translation_report.md](displacement_translation_report.md): Front and rear displacement translation, calibration constants, and rear-linkage fitting
@@ -16,6 +19,13 @@ This folder contains the main framework document and the supporting technical no
 - [spring_rate_preload_report.md](spring_rate_preload_report.md): Using Graph 1 to distinguish preload errors from spring-rate errors
 - [compression_damping_report.md](compression_damping_report.md): Using the compression side of Graph 2 to diagnose harshness and brake dive
 - [rebound_damping_report.md](rebound_damping_report.md): Using the rebound side of Graph 2 and telemetry to diagnose packing and pogo behavior
+
+## Software Design
+
+- [software/README.md](software/README.md): Entry point for product and software-design notes
+- [software/index.md](software/index.md): Top-level index for software product and calibration design notes
+- [software/product/daq_visualization_software_report.md](software/product/daq_visualization_software_report.md): Product overview for a DAQ visualization application built on the theoretical framework
+- [software/calibration/calibration_profile_workflow.md](software/calibration/calibration_profile_workflow.md): Calibration-profile workflow for all derived formulas
 
 ## Suggested Reading Order
 
@@ -28,6 +38,14 @@ This folder contains the main framework document and the supporting technical no
 7. [spring_rate_preload_report.md](spring_rate_preload_report.md)
 8. [compression_damping_report.md](compression_damping_report.md)
 9. [rebound_damping_report.md](rebound_damping_report.md)
+
+## Software Reading Path
+
+1. [overview.md](overview.md)
+2. [software/README.md](software/README.md)
+3. [software/index.md](software/index.md)
+4. [software/product/daq_visualization_software_report.md](software/product/daq_visualization_software_report.md)
+5. [software/calibration/calibration_profile_workflow.md](software/calibration/calibration_profile_workflow.md)
 
 ## Legacy Index
 

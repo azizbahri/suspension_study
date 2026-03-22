@@ -1,6 +1,9 @@
 # Suspension DAQ Documentation Index
 
-This directory contains the main framework document and the supporting technical notes that expand the core mathematical sections, graph construction, and tuning logic.
+This directory contains two categories of material:
+
+- theoretical notes that define the measurement, signal-processing, and tuning framework,
+- software-design notes that describe applications built on that framework.
 
 ## Primary Document
 
@@ -17,6 +20,13 @@ This directory contains the main framework document and the supporting technical
 - [compression_damping_report.md](compression_damping_report.md): Detailed explanation of how the compression side of Graph 2 is used to diagnose harshness, brake dive, and low-speed versus high-speed compression behavior.
 - [rebound_damping_report.md](rebound_damping_report.md): Detailed explanation of how the rebound side of Graph 2 and telemetry are used to diagnose packing, pogo behavior, and rebound-damping balance.
 
+## Software Design Notes
+
+- [software/README.md](software/README.md): Entry point for product and software-design notes.
+- [software/index.md](software/index.md): Top-level software-design index.
+- [software/product/daq_visualization_software_report.md](software/product/daq_visualization_software_report.md): Product overview of a visualization tool that imports DAQ logs, generates the main analysis graphs, and supports tuning decisions.
+- [software/calibration/calibration_profile_workflow.md](software/calibration/calibration_profile_workflow.md): Calibration workflow for building and validating the constants behind the analysis formulas.
+
 ## Recommended Reading Order
 
 1. [overview.md](overview.md)
@@ -28,3 +38,11 @@ This directory contains the main framework document and the supporting technical
 7. [spring_rate_preload_report.md](spring_rate_preload_report.md)
 8. [compression_damping_report.md](compression_damping_report.md)
 9. [rebound_damping_report.md](rebound_damping_report.md)
+
+## Software Reading Order
+
+1. [overview.md](overview.md)
+2. [software/README.md](software/README.md)
+3. [software/index.md](software/index.md)
+4. [software/product/daq_visualization_software_report.md](software/product/daq_visualization_software_report.md)
+5. [software/calibration/calibration_profile_workflow.md](software/calibration/calibration_profile_workflow.md)
