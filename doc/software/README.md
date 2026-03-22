@@ -6,6 +6,10 @@ The documents here are not part of the core derivation set. They describe how th
 
 The software documents are organized into subdirectories so product design and calibration design can evolve independently.
 
+They are also separated by concern so product definition, calibration logic, and UI definition can evolve without being mixed together.
+
+Technology decisions and architecture notes are kept separate as well so implementation choices can evolve without rewriting the product and workflow notes.
+
 ## Software Index
 
 - [index.md](index.md): Top-level index for the software-design documentation
@@ -24,6 +28,17 @@ The software documents are organized into subdirectories so product design and c
 - [calibration/rear_travel_calibration_design.md](calibration/rear_travel_calibration_design.md): Rear calibration and linkage screen design
 - [calibration/velocity_processing_design.md](calibration/velocity_processing_design.md): Velocity setup, filtering, and validation design
 - [calibration/pitch_processing_design.md](calibration/pitch_processing_design.md): Pitch setup, bias, and validation design
+
+## UI Design
+
+- [ui/README.md](ui/README.md): UI-design notes index
+- [ui/mvp_ui_document.md](ui/mvp_ui_document.md): MVP user-interface definition, required screens, and essential controls
+
+## Technology Design
+
+- [technology/README.md](technology/README.md): Technology and architecture notes index
+- [technology/tech_stack_decision_note.md](technology/tech_stack_decision_note.md): Decision note recommending React, TypeScript, Tauri, and Python analysis services
+- [technology/target_architecture.md](technology/target_architecture.md): Target architecture for a desktop-first product with future cloud and AI evolution
 
 ## Relationship to the Theory Notes
 
