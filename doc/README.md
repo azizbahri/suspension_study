@@ -40,6 +40,10 @@ This folder is split into three layers:
 - [implementation/backend_data_structures.md](implementation/backend_data_structures.md): Canonical backend-side objects for sessions, profiles, validation, analysis, and comparison
 - [implementation/implementation_roadmap.md](implementation/implementation_roadmap.md): Delivery sequence for backend modules, frontend integration, and MVP slices
 
+## Progress Tracking
+
+- [tracking/repository_progress.md](tracking/repository_progress.md): Repository-wide progress tracker covering docs, contracts, frontend, backend, analysis, comparison, and hardening
+
 ## Suggested Reading Order
 
 1. [foundation/overview.md](foundation/overview.md)
