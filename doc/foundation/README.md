@@ -31,5 +31,4 @@ This folder contains the theory and analysis foundation for the suspension DAQ w
 
 ## Related Tracks
 
-- [../software-design/README.md](../software-design/README.md): Product and software design documents built on this foundation
-- [../implementation/README.md](../implementation/README.md): Backend and implementation-planning documents derived from the software design
+- See the documentation index for Software Design and Implementation planning: [../index.md](../index.md)

@@ -26,23 +26,15 @@ This folder is split into three layers:
 
 ## Software Design
 
-- [software-design/README.md](software-design/README.md): Entry point for product, calibration, UI, and technology design notes
-- [software-design/index.md](software-design/index.md): Top-level index for software design material
-- [software-design/product/daq_visualization_software_report.md](software-design/product/daq_visualization_software_report.md): Product overview for a DAQ visualization application built on the theoretical framework
-- [software-design/calibration/calibration_profile_workflow.md](software-design/calibration/calibration_profile_workflow.md): Calibration-profile workflow for all derived formulas
+- See [index.md](index.md) for available software-design materials and planned content.
 
 ## Implementation Planning
 
-- [implementation/README.md](implementation/README.md): Entry point for implementation-facing notes that convert the design into backend contracts and build phases
-- [implementation/api_contract.md](implementation/api_contract.md): Application API contract for session import, calibration, analysis, and comparison
-- [implementation/c4_architecture.md](implementation/c4_architecture.md): C4 architecture note covering system context, containers, and backend component boundaries
-- [implementation/communication_architecture.md](implementation/communication_architecture.md): Communication model between the React frontend and Python backend, including local API and future cloud options
-- [implementation/backend_data_structures.md](implementation/backend_data_structures.md): Canonical backend-side objects for sessions, profiles, validation, analysis, and comparison
-- [implementation/implementation_roadmap.md](implementation/implementation_roadmap.md): Delivery sequence for backend modules, frontend integration, and MVP slices
+- See [index.md](index.md) for implementation planning notes and roadmap links when available.
 
 ## Progress Tracking
 
-- [tracking/repository_progress.md](tracking/repository_progress.md): Repository-wide progress tracker covering docs, contracts, frontend, backend, analysis, comparison, and hardening
+- Repository progress tracker was removed from this branch; see [index.md](index.md) for current documentation status.
 
 ## Suggested Reading Order
 
@@ -58,23 +50,11 @@ This folder is split into three layers:
 
 ## Software Reading Path
 
-1. [foundation/overview.md](foundation/overview.md)
-2. [software-design/README.md](software-design/README.md)
-3. [software-design/index.md](software-design/index.md)
-4. [software-design/product/daq_visualization_software_report.md](software-design/product/daq_visualization_software_report.md)
-5. [software-design/calibration/calibration_profile_workflow.md](software-design/calibration/calibration_profile_workflow.md)
+These software-design reading materials are planned but not present in this branch. See the documentation index for current available content: [index.md](index.md).
 
 ## Implementation Reading Path
 
-1. [software-design/product/daq_visualization_software_report.md](software-design/product/daq_visualization_software_report.md)
-2. [software-design/calibration/calibration_profile_workflow.md](software-design/calibration/calibration_profile_workflow.md)
-3. [software-design/calibration/calibration_profile_data_model.md](software-design/calibration/calibration_profile_data_model.md)
-4. [implementation/README.md](implementation/README.md)
-5. [implementation/api_contract.md](implementation/api_contract.md)
-6. [implementation/c4_architecture.md](implementation/c4_architecture.md)
-7. [implementation/communication_architecture.md](implementation/communication_architecture.md)
-8. [implementation/backend_data_structures.md](implementation/backend_data_structures.md)
-9. [implementation/implementation_roadmap.md](implementation/implementation_roadmap.md)
+Implementation reading material references are planned but not present in this branch. See [index.md](index.md) for the current documentation state.
 
 ## Legacy Index
 

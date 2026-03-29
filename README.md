@@ -10,14 +10,13 @@ The main documentation lives in [doc/README.md](doc/README.md).
 
 This repository also includes workspace-specific Copilot instructions in [.github/copilot-instructions.md](.github/copilot-instructions.md) so future requests are evaluated with the project's hardware-plus-software engineering perspective.
 
-Repository-wide implementation and delivery progress is tracked in [doc/tracking/repository_progress.md](doc/tracking/repository_progress.md).
+Repository-wide implementation and delivery progress tracking document was removed from this branch; see [doc/index.md](doc/index.md) for current documentation links.
 
 Key entry points:
 
-- [doc/overview.md](doc/overview.md): Main framework document
+- [doc/foundation/overview.md](doc/foundation/overview.md): Main framework document
 - [doc/README.md](doc/README.md): Documentation index and reading guide
-- [doc/software/README.md](doc/software/README.md): Software-design notes derived from the theoretical framework
-- [doc/software/index.md](doc/software/index.md): Software product and calibration design index
+- [doc/index.md](doc/index.md): Documentation index with links to available materials
 
 ## Scope
 
@@ -38,7 +37,7 @@ Software-design material:
 
 ## Frontend
 
-The repository includes a React and TypeScript frontend prototype under [frontend](frontend).
+The repository previously included a React and TypeScript frontend prototype; that workspace is not present in this branch.
 
 Current frontend scope:
 
@@ -82,7 +81,7 @@ Set-Location frontend
 npm run build
 ```
 
-The build output is written to [frontend/dist](frontend/dist).
+When present, a production build is written to frontend/dist (not present in this branch).
 
 ### Lint the Frontend
 

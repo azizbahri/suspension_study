@@ -24,20 +24,10 @@ This directory contains three categories of material:
 - [foundation/rebound_damping_report.md](foundation/rebound_damping_report.md): Detailed explanation of how the rebound side of Graph 2 and telemetry are used to diagnose packing, pogo behavior, and rebound-damping balance.
 
 ## Software Design Notes
-
-- [software-design/README.md](software-design/README.md): Entry point for product and software-design notes.
-- [software-design/index.md](software-design/index.md): Top-level software-design index.
-- [software-design/product/daq_visualization_software_report.md](software-design/product/daq_visualization_software_report.md): Product overview of a visualization tool that imports DAQ logs, generates the main analysis graphs, and supports tuning decisions.
-- [software-design/calibration/calibration_profile_workflow.md](software-design/calibration/calibration_profile_workflow.md): Calibration workflow for building and validating the constants behind the analysis formulas.
+These materials are planned but not present in this branch. See the documentation index for available content: [README.md](README.md) or [doc/README.md](README.md).
 
 ## Implementation Notes
-
-- [implementation/README.md](implementation/README.md): Entry point for backend contract, data-structure, and delivery-planning notes.
-- [implementation/api_contract.md](implementation/api_contract.md): Service contract for session import, calibration, analysis, and comparison.
-- [implementation/c4_architecture.md](implementation/c4_architecture.md): C4 architecture note for system context, containers, and backend components.
-- [implementation/communication_architecture.md](implementation/communication_architecture.md): Communication model for a React frontend and Python backend in local and future remote deployment.
-- [implementation/backend_data_structures.md](implementation/backend_data_structures.md): Canonical backend object model used across persistence and API layers.
-- [implementation/implementation_roadmap.md](implementation/implementation_roadmap.md): Recommended build sequence and MVP slicing strategy.
+Implementation planning documents are referenced in the design, but the implementation folder is not present in this branch. See [README.md](README.md) for the current available documentation.
 
 ## Recommended Reading Order
 
@@ -53,20 +43,8 @@ This directory contains three categories of material:
 
 ## Software Reading Order
 
-1. [foundation/overview.md](foundation/overview.md)
-2. [software-design/README.md](software-design/README.md)
-3. [software-design/index.md](software-design/index.md)
-4. [software-design/product/daq_visualization_software_report.md](software-design/product/daq_visualization_software_report.md)
-5. [software-design/calibration/calibration_profile_workflow.md](software-design/calibration/calibration_profile_workflow.md)
+Software-design reading sequences are planned but not present in this branch. Refer to the documentation index for available content: [README.md](README.md).
 
 ## Implementation Reading Order
 
-1. [software-design/product/daq_visualization_software_report.md](software-design/product/daq_visualization_software_report.md)
-2. [software-design/calibration/calibration_profile_workflow.md](software-design/calibration/calibration_profile_workflow.md)
-3. [software-design/calibration/calibration_profile_data_model.md](software-design/calibration/calibration_profile_data_model.md)
-4. [implementation/README.md](implementation/README.md)
-5. [implementation/api_contract.md](implementation/api_contract.md)
-6. [implementation/c4_architecture.md](implementation/c4_architecture.md)
-7. [implementation/communication_architecture.md](implementation/communication_architecture.md)
-8. [implementation/backend_data_structures.md](implementation/backend_data_structures.md)
-9. [implementation/implementation_roadmap.md](implementation/implementation_roadmap.md)
+Implementation reading sequences are planned but not present in this branch. Refer to the documentation index for available content: [README.md](README.md).

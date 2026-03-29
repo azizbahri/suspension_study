@@ -31,5 +31,4 @@ This directory contains the theory and analysis foundation of the suspension DAQ
 
 ## Derived Documentation
 
-- [../software-design/README.md](../software-design/README.md): Product and software design notes derived from the foundation
-- [../implementation/README.md](../implementation/README.md): Implementation-planning notes derived from the software design
+Software-design and implementation notes are referenced from the documentation index; see [../index.md](../index.md) for links and planned content.
