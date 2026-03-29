@@ -23,6 +23,9 @@ export const handlers = [
     const payload = await request.json()
     return HttpResponse.json({ ...SESSION_1, ...(payload as object) }, { status: 201 })
   }),
+  http.post(`${BASE}/sessions/upload`, async () => {
+    return HttpResponse.json({ ...SESSION_1, name: 'Uploaded Session' }, { status: 201 })
+  }),
   http.delete(`${BASE}/sessions/:id`, () => new HttpResponse(null, { status: 204 })),
 
   // Analyze

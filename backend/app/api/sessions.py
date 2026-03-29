@@ -1,14 +1,16 @@
 from __future__ import annotations
 
+import json
 import uuid
 from datetime import datetime, timezone
-from typing import Literal
+from typing import Annotated, Literal
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Form, HTTPException, UploadFile
 from pydantic import BaseModel
 
 from app.models.session import ColumnMap, Session
 from app.storage import sessions as session_store
+from app.config import UPLOADS_DIR
 
 router = APIRouter(prefix="/sessions", tags=["sessions"])
 
@@ -39,6 +41,43 @@ def import_session(req: ImportRequest):
         csv_path=req.csv_path,
         column_map=req.column_map,
         velocity_quantity=req.velocity_quantity,
+        created_at=datetime.now(timezone.utc),
+        analyzed=False,
+    )
+    session_store.save_session(session)
+    return session
+
+
+@router.post("/upload", response_model=Session, status_code=201)
+async def upload_session(
+    file: UploadFile,
+    name: Annotated[str, Form()],
+    bike_slug: Annotated[str, Form()],
+    velocity_quantity: Annotated[Literal["wheel", "shaft"], Form()] = "wheel",
+    column_map: Annotated[str, Form()] = "{}",
+):
+    """Accept a CSV file from the client's local filesystem, save it server-side, and create a session."""
+    if not file.filename or not file.filename.lower().endswith(".csv"):
+        raise HTTPException(status_code=400, detail="Only .csv files are accepted")
+
+    session_id = str(uuid.uuid4())
+    dest = UPLOADS_DIR / f"{session_id}.csv"
+    contents = await file.read()
+    dest.write_bytes(contents)
+
+    try:
+        col_map = ColumnMap(**json.loads(column_map))
+    except (json.JSONDecodeError, TypeError, ValueError):
+        dest.unlink(missing_ok=True)
+        raise HTTPException(status_code=422, detail="Invalid column_map: expected a JSON object")
+
+    session = Session(
+        id=session_id,
+        name=name,
+        bike_slug=bike_slug,
+        csv_path=str(dest),
+        column_map=col_map,
+        velocity_quantity=velocity_quantity,
         created_at=datetime.now(timezone.utc),
         analyzed=False,
     )

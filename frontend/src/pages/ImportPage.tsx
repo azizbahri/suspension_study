@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBikes } from '../hooks/useBikes';
-import { useImportSession } from '../hooks/useSessions';
+import { useImportSession, useUploadSession } from '../hooks/useSessions';
 import BikeSelector from '../components/BikeSelector';
 import type { ColumnMap } from '../types/session';
 
@@ -20,8 +20,11 @@ const DEFAULT_COLUMN_MAP: ColumnMap = {
 export default function ImportPage() {
   const navigate = useNavigate();
   const { data: bikes = [] } = useBikes();
-  const { mutateAsync: importSession, isPending } = useImportSession();
+  const { mutateAsync: importSession, isPending: isImporting } = useImportSession();
+  const { mutateAsync: uploadSession, isPending: isUploading } = useUploadSession();
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [csvPath, setCsvPath] = useState('');
   const [sessionName, setSessionName] = useState('');
   const [bikeSlug, setBikeSlug] = useState('');
@@ -30,21 +33,40 @@ export default function ImportPage() {
   const [importedId, setImportedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const isPending = isImporting || isUploading;
+
   const setCol = (key: keyof ColumnMap, value: string | boolean | null) => {
     setColumnMap((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    setSelectedFile(file);
+    if (file) setCsvPath(file.name);
   };
 
   const handleImport = async () => {
     setError(null);
     setImportedId(null);
     try {
-      const session = await importSession({
-        csv_path: csvPath,
-        name: sessionName,
-        bike_slug: bikeSlug,
-        velocity_quantity: velocityQuantity,
-        column_map: columnMap,
-      });
+      let session;
+      if (selectedFile) {
+        session = await uploadSession({
+          file: selectedFile,
+          name: sessionName,
+          bike_slug: bikeSlug,
+          velocity_quantity: velocityQuantity,
+          column_map: columnMap,
+        });
+      } else {
+        session = await importSession({
+          csv_path: csvPath,
+          name: sessionName,
+          bike_slug: bikeSlug,
+          velocity_quantity: velocityQuantity,
+          column_map: columnMap,
+        });
+      }
       setImportedId(session.id);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Import failed');
@@ -60,16 +82,57 @@ export default function ImportPage() {
       <h1 className="text-xl font-semibold text-gray-900 mb-6">Import Session</h1>
 
       <div className="bg-white rounded-lg shadow-sm p-6 space-y-5">
-        {/* CSV path */}
+        {/* CSV file — browse local machine or type a server path */}
         <div>
-          <label className={labelCls}>CSV file path</label>
-          <input
-            className={inputCls}
-            type="text"
-            value={csvPath}
-            onChange={(e) => setCsvPath(e.target.value)}
-            placeholder="/home/user/ride_data/session01.csv"
-          />
+          <label className={labelCls}>CSV file</label>
+          <div className="flex gap-2">
+            <input
+              className={inputCls}
+              type="text"
+              value={csvPath}
+              readOnly={!!selectedFile}
+              onChange={(e) => {
+                setCsvPath(e.target.value);
+                setSelectedFile(null);
+              }}
+              placeholder="/home/user/ride_data/session01.csv"
+            />
+            {/* Hidden native file picker — only .csv files */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv"
+              className="hidden"
+              onChange={handleFileChange}
+              data-testid="csv-file-input"
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="shrink-0 px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            >
+              Browse…
+            </button>
+          </div>
+          {selectedFile && (
+            <p className="mt-1 text-xs text-gray-500">
+              Local file selected:{' '}
+              <span className="font-medium text-gray-700">{selectedFile.name}</span>
+              {' — '}
+              <button
+                type="button"
+                className="text-orange-600 hover:underline"
+                onClick={() => {
+                  setSelectedFile(null);
+                  setCsvPath('');
+                  // Reset the native file input so the same file can be re-selected
+                  if (fileInputRef.current) fileInputRef.current.value = '';
+                }}
+              >
+                clear
+              </button>
+            </p>
+          )}
         </div>
 
         {/* Session name */}
@@ -180,7 +243,7 @@ export default function ImportPage() {
         {/* Submit */}
         <button
           onClick={handleImport}
-          disabled={isPending || !csvPath || !sessionName || !bikeSlug}
+          disabled={isPending || (!csvPath && !selectedFile) || !sessionName || !bikeSlug}
           className="w-full py-2 bg-orange-500 text-white rounded-md text-sm font-medium hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {isPending ? 'Importing…' : 'Import Session'}
