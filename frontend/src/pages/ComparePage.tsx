@@ -176,7 +176,7 @@ export default function ComparePage() {
         <div>
           <p className="text-xs font-medium text-gray-600 mb-2">Select up to 3 sessions</p>
           <div className="space-y-1.5">
-            {sessions.map((s, _i) => {
+            {sessions.map((s) => {
               const color = SESSION_COLORS[selectedIds.indexOf(s.id)];
               const isSelected = selectedIds.includes(s.id);
               const isDisabled = !isSelected && selectedIds.length >= 3;
