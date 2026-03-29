@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBikes } from '../hooks/useBikes';
 import { useImportSession } from '../hooks/useSessions';
 import BikeSelector from '../components/BikeSelector';
+import FileBrowser from '../components/FileBrowser';
 import type { ColumnMap } from '../types/session';
 
 const DEFAULT_COLUMN_MAP: ColumnMap = {
@@ -29,6 +30,7 @@ export default function ImportPage() {
   const [columnMap, setColumnMap] = useState<ColumnMap>(DEFAULT_COLUMN_MAP);
   const [importedId, setImportedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showBrowser, setShowBrowser] = useState(false);
 
   const setCol = (key: keyof ColumnMap, value: string | boolean | null) => {
     setColumnMap((prev) => ({ ...prev, [key]: value }));
@@ -63,13 +65,22 @@ export default function ImportPage() {
         {/* CSV path */}
         <div>
           <label className={labelCls}>CSV file path</label>
-          <input
-            className={inputCls}
-            type="text"
-            value={csvPath}
-            onChange={(e) => setCsvPath(e.target.value)}
-            placeholder="/home/user/ride_data/session01.csv"
-          />
+          <div className="flex gap-2">
+            <input
+              className={inputCls}
+              type="text"
+              value={csvPath}
+              onChange={(e) => setCsvPath(e.target.value)}
+              placeholder="/home/user/ride_data/session01.csv"
+            />
+            <button
+              type="button"
+              onClick={() => setShowBrowser(true)}
+              className="shrink-0 px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            >
+              Browse…
+            </button>
+          </div>
         </div>
 
         {/* Session name */}
@@ -186,6 +197,16 @@ export default function ImportPage() {
           {isPending ? 'Importing…' : 'Import Session'}
         </button>
       </div>
+
+      {showBrowser && (
+        <FileBrowser
+          onSelect={(path) => {
+            setCsvPath(path);
+            setShowBrowser(false);
+          }}
+          onClose={() => setShowBrowser(false)}
+        />
+      )}
     </div>
   );
 }
