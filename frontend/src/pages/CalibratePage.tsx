@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { Info } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import { calibrateFront, calibrateRear, getCalibrationExamples } from '../api/calibrate';
 import type { FrontCalibrationResult, RearCalibrationResult } from '../api/calibrate';
 import { useBikes, useCreateBike, useUpdateBike, useDeleteBike } from '../hooks/useBikes';
 import type { BikeProfile } from '../types/bike';
+import CalibrateInfoSidebar, { type CalibrateInfoKey } from '../components/CalibrateInfoSidebar';
 
 type FrontRow = { stroke_mm: string; voltage_v: string };
 type RearRow = { shock_stroke_mm: string; wheel_travel_mm: string };
@@ -49,18 +51,36 @@ const inputCls =
   'border border-gray-300 rounded-md px-2 py-1 text-xs w-full focus:outline-none focus:ring-1 focus:ring-orange-500';
 const labelCls = 'block text-xs font-medium text-gray-600 mb-1';
 
+function InfoButton({ onClick, label }: { onClick: () => void; label: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="ml-1 inline-flex items-center text-gray-400 hover:text-orange-500 transition-colors"
+      aria-label={`More info about ${label}`}
+    >
+      <Info size={11} />
+    </button>
+  );
+}
+
 function NumericInput({
   label,
+  onInfo,
   value,
   onChange,
 }: {
   label: string;
+  onInfo?: () => void;
   value: number;
   onChange: (v: number) => void;
 }) {
   return (
     <div>
-      <label className={labelCls}>{label}</label>
+      <label className={labelCls}>
+        {label}
+        {onInfo && <InfoButton onClick={onInfo} label={label} />}
+      </label>
       <input
         className={inputCls}
         type="number"
@@ -77,6 +97,9 @@ export default function CalibratePage() {
   const createBike = useCreateBike();
   const updateBike = useUpdateBike();
   const deleteBike = useDeleteBike();
+
+  // Info sidebar state
+  const [activeInfoKey, setActiveInfoKey] = useState<CalibrateInfoKey | null>(null);
 
   // Front calibration state
   const [frontRows, setFrontRows] = useState<FrontRow[]>(emptyFrontRows());
@@ -229,12 +252,14 @@ export default function CalibratePage() {
     ['ls_threshold_mm_s', 'LS threshold (mm/s)'],
   ];
 
-  return (
-    <div className="max-w-5xl mx-auto space-y-6">
-      <h1 className="text-xl font-semibold text-gray-900">Calibrate</h1>
 
-      {/* Two-column calibration panels */}
-      <div className="grid grid-cols-2 gap-6">
+  return (
+    <>
+      <div className="max-w-5xl mx-auto space-y-6">
+        <h1 className="text-xl font-semibold text-gray-900">Calibrate</h1>
+
+        {/* Two-column calibration panels */}
+        <div className="grid grid-cols-2 gap-6">
         {/* Front Calibration */}
         <div className="bg-white rounded-lg shadow-sm p-5">
           <div className="flex items-center justify-between mb-1">
@@ -253,8 +278,14 @@ export default function CalibratePage() {
           <table className="w-full text-xs mb-2 border-collapse">
             <thead>
               <tr className="text-gray-500 border-b border-gray-100">
-                <th className="text-left py-1 pr-2">Stroke (mm)</th>
-                <th className="text-left py-1">Voltage (V)</th>
+                <th className="text-left py-1 pr-2">
+                  Stroke (mm)
+                  <InfoButton onClick={() => setActiveInfoKey('front_stroke')} label="Stroke (mm)" />
+                </th>
+                <th className="text-left py-1">
+                  Voltage (V)
+                  <InfoButton onClick={() => setActiveInfoKey('front_voltage')} label="Voltage (V)" />
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -309,29 +340,46 @@ export default function CalibratePage() {
 
           {frontResult && (
             <div className="bg-orange-50 border border-orange-200 rounded-md p-3 text-xs space-y-1 mb-3">
-              <p><span className="font-medium">C_cal:</span> {frontResult.c_cal.toFixed(4)}</p>
-              <p><span className="font-medium">V0:</span> {frontResult.v0.toFixed(4)} V</p>
-              <p><span className="font-medium">RMSE:</span> {frontResult.rmse.toFixed(4)} mm</p>
+              <p>
+                <span className="font-medium">C_cal:</span>
+                <InfoButton onClick={() => setActiveInfoKey('result_c_cal')} label="C_cal" />
+                {' '}{frontResult.c_cal.toFixed(4)}
+              </p>
+              <p>
+                <span className="font-medium">V0:</span>
+                <InfoButton onClick={() => setActiveInfoKey('result_v0')} label="V0" />
+                {' '}{frontResult.v0.toFixed(4)} V
+              </p>
+              <p>
+                <span className="font-medium">RMSE:</span>
+                <InfoButton onClick={() => setActiveInfoKey('result_rmse_front')} label="RMSE" />
+                {' '}{frontResult.rmse.toFixed(4)} mm
+              </p>
             </div>
           )}
 
           {frontResult && (
-            <div className="flex gap-2 items-center">
-              <select
-                value={selectedSlugForFront}
-                onChange={(e) => setSelectedSlugForFront(e.target.value)}
-                className="flex-1 border border-gray-300 rounded-md px-2 py-1 text-xs"
-              >
-                <option value="">Select bike…</option>
-                {bikes.map((b) => <option key={b.slug} value={b.slug}>{b.name}</option>)}
-              </select>
-              <button
-                onClick={handleApplyFront}
-                disabled={!selectedSlugForFront}
-                className="px-3 py-1 bg-gray-800 text-white rounded-md text-xs hover:bg-gray-700 disabled:opacity-40"
-              >
-                Apply
-              </button>
+            <div>
+              <p className="text-xs text-gray-500 mb-1">
+                Save <span className="font-medium text-gray-700">C_front</span> and <span className="font-medium text-gray-700">V0_front</span> to a bike profile:
+              </p>
+              <div className="flex gap-2 items-center">
+                <select
+                  value={selectedSlugForFront}
+                  onChange={(e) => setSelectedSlugForFront(e.target.value)}
+                  className="flex-1 border border-gray-300 rounded-md px-2 py-1 text-xs"
+                >
+                  <option value="">Select profile…</option>
+                  {bikes.map((b) => <option key={b.slug} value={b.slug}>{b.name}</option>)}
+                </select>
+                <button
+                  onClick={handleApplyFront}
+                  disabled={!selectedSlugForFront}
+                  className="px-3 py-1 bg-gray-800 text-white rounded-md text-xs hover:bg-gray-700 disabled:opacity-40"
+                >
+                  Apply
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -354,8 +402,14 @@ export default function CalibratePage() {
           <table className="w-full text-xs mb-2 border-collapse">
             <thead>
               <tr className="text-gray-500 border-b border-gray-100">
-                <th className="text-left py-1 pr-2">Shock stroke (mm)</th>
-                <th className="text-left py-1">Wheel travel (mm)</th>
+                <th className="text-left py-1 pr-2">
+                  Shock stroke (mm)
+                  <InfoButton onClick={() => setActiveInfoKey('rear_shock_stroke')} label="Shock stroke (mm)" />
+                </th>
+                <th className="text-left py-1">
+                  Wheel travel (mm)
+                  <InfoButton onClick={() => setActiveInfoKey('rear_wheel_travel')} label="Wheel travel (mm)" />
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -410,30 +464,51 @@ export default function CalibratePage() {
 
           {rearResult && (
             <div className="bg-orange-50 border border-orange-200 rounded-md p-3 text-xs space-y-1 mb-3">
-              <p><span className="font-medium">a:</span> {rearResult.a.toFixed(6)}</p>
-              <p><span className="font-medium">b:</span> {rearResult.b.toFixed(6)}</p>
-              <p><span className="font-medium">c:</span> {rearResult.c.toFixed(6)}</p>
-              <p><span className="font-medium">RMSE:</span> {rearResult.rmse.toFixed(4)} mm</p>
+              <p>
+                <span className="font-medium">a:</span>
+                <InfoButton onClick={() => setActiveInfoKey('result_a')} label="a" />
+                {' '}{rearResult.a.toFixed(6)}
+              </p>
+              <p>
+                <span className="font-medium">b:</span>
+                <InfoButton onClick={() => setActiveInfoKey('result_b')} label="b" />
+                {' '}{rearResult.b.toFixed(6)}
+              </p>
+              <p>
+                <span className="font-medium">c:</span>
+                <InfoButton onClick={() => setActiveInfoKey('result_c')} label="c" />
+                {' '}{rearResult.c.toFixed(6)}
+              </p>
+              <p>
+                <span className="font-medium">RMSE:</span>
+                <InfoButton onClick={() => setActiveInfoKey('result_rmse_rear')} label="RMSE" />
+                {' '}{rearResult.rmse.toFixed(4)} mm
+              </p>
             </div>
           )}
 
           {rearResult && (
-            <div className="flex gap-2 items-center">
-              <select
-                value={selectedSlugForRear}
-                onChange={(e) => setSelectedSlugForRear(e.target.value)}
-                className="flex-1 border border-gray-300 rounded-md px-2 py-1 text-xs"
-              >
-                <option value="">Select bike…</option>
-                {bikes.map((b) => <option key={b.slug} value={b.slug}>{b.name}</option>)}
-              </select>
-              <button
-                onClick={handleApplyRear}
-                disabled={!selectedSlugForRear}
-                className="px-3 py-1 bg-gray-800 text-white rounded-md text-xs hover:bg-gray-700 disabled:opacity-40"
-              >
-                Apply
-              </button>
+            <div>
+              <p className="text-xs text-gray-500 mb-1">
+                Save <span className="font-medium text-gray-700">Linkage A/B/C</span> to a bike profile:
+              </p>
+              <div className="flex gap-2 items-center">
+                <select
+                  value={selectedSlugForRear}
+                  onChange={(e) => setSelectedSlugForRear(e.target.value)}
+                  className="flex-1 border border-gray-300 rounded-md px-2 py-1 text-xs"
+                >
+                  <option value="">Select profile…</option>
+                  {bikes.map((b) => <option key={b.slug} value={b.slug}>{b.name}</option>)}
+                </select>
+                <button
+                  onClick={handleApplyRear}
+                  disabled={!selectedSlugForRear}
+                  className="px-3 py-1 bg-gray-800 text-white rounded-md text-xs hover:bg-gray-700 disabled:opacity-40"
+                >
+                  Apply
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -507,7 +582,10 @@ export default function CalibratePage() {
             </h3>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className={labelCls}>Name</label>
+                <label className={labelCls}>
+                  Name
+                  <InfoButton onClick={() => setActiveInfoKey('name')} label="Name" />
+                </label>
                 <input
                   className={inputCls}
                   type="text"
@@ -516,7 +594,10 @@ export default function CalibratePage() {
                 />
               </div>
               <div>
-                <label className={labelCls}>Slug</label>
+                <label className={labelCls}>
+                  Slug
+                  <InfoButton onClick={() => setActiveInfoKey('slug')} label="Slug" />
+                </label>
                 <input
                   className={inputCls}
                   type="text"
@@ -529,6 +610,7 @@ export default function CalibratePage() {
                 <NumericInput
                   key={key}
                   label={label}
+                  onInfo={() => setActiveInfoKey(key as CalibrateInfoKey)}
                   value={bikeForm[key] as number}
                   onChange={(v) => setBikeField(key, v)}
                 />
@@ -555,5 +637,12 @@ export default function CalibratePage() {
         )}
       </div>
     </div>
+
+      {/* Field details sidebar */}
+      <CalibrateInfoSidebar
+        activeKey={activeInfoKey}
+        onClose={() => setActiveInfoKey(null)}
+      />
+    </>
   );
 }

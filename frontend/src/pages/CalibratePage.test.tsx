@@ -107,4 +107,35 @@ describe('CalibratePage', () => {
       expect(screen.getByText('Singular matrix')).toBeInTheDocument()
     )
   })
+
+  it('opens the info sidebar when an info button is clicked', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<CalibratePage />)
+
+    const infoButtons = screen.getAllByRole('button', { name: /more info about/i })
+    await user.click(infoButtons[0])
+
+    // Sidebar panel should be visible with field details content
+    expect(screen.getByRole('complementary', { name: /field details/i })).toBeInTheDocument()
+    // A section heading inside the sidebar should appear
+    expect(screen.getByText(/what this is/i)).toBeInTheDocument()
+  })
+
+  it('closes the info sidebar when the close button is clicked', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<CalibratePage />)
+
+    // Open the sidebar
+    const infoButtons = screen.getAllByRole('button', { name: /more info about/i })
+    await user.click(infoButtons[0])
+    expect(screen.getByText(/what this is/i)).toBeInTheDocument()
+
+    // Close it
+    await user.click(screen.getByRole('button', { name: /close field details/i }))
+
+    // The sidebar content should no longer be present
+    await waitFor(() =>
+      expect(screen.queryByText(/what this is/i)).not.toBeInTheDocument()
+    )
+  })
 })
