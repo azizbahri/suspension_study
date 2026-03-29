@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useSessions } from '../hooks/useSessions';
 import { useAnalyzeSession } from '../hooks/useAnalysis';
@@ -12,26 +12,19 @@ const SEVERITY_ORDER = { critical: 0, warning: 1, info: 2 } as const;
 
 export default function AnalyzePage() {
   const [searchParams] = useSearchParams();
-  const [selectedSessionId, setSelectedSessionId] = useState<string>(
-    searchParams.get('session') ?? ''
-  );
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const { data: sessions = [] } = useSessions();
   const { mutateAsync: analyze, isPending } = useAnalyzeSession();
-
-  // Pre-select from URL param
-  useEffect(() => {
-    const id = searchParams.get('session');
-    if (id) setSelectedSessionId(id);
-  }, [searchParams]);
+  const currentSelectedSessionId = selectedSessionId ?? searchParams.get('session') ?? '';
 
   const handleAnalyze = async () => {
-    if (!selectedSessionId) return;
+    if (!currentSelectedSessionId) return;
     setError(null);
     try {
-      const res = await analyze(selectedSessionId);
+      const res = await analyze(currentSelectedSessionId);
       setResult(res);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Analysis failed');
@@ -51,7 +44,7 @@ export default function AnalyzePage() {
       {/* Session selector */}
       <div className="bg-white rounded-lg shadow-sm p-4 flex items-center gap-4">
         <select
-          value={selectedSessionId}
+          value={currentSelectedSessionId}
           onChange={(e) => { setSelectedSessionId(e.target.value); setResult(null); setError(null); }}
           className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
         >
@@ -64,7 +57,7 @@ export default function AnalyzePage() {
         </select>
         <button
           onClick={handleAnalyze}
-          disabled={isPending || !selectedSessionId}
+          disabled={isPending || !currentSelectedSessionId}
           className="px-5 py-2 bg-orange-500 text-white rounded-md text-sm font-medium hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {isPending ? 'Analyzing…' : 'Analyze / Re-analyze'}

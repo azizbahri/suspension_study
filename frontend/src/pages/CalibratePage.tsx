@@ -208,7 +208,7 @@ export default function CalibratePage() {
     if (!confirm(`Delete bike "${slug}"?`)) return;
     try {
       await deleteBike.mutateAsync(slug);
-    } catch (e) {
+    } catch {
       // ignore
     }
   };
