@@ -49,23 +49,65 @@ const inputCls =
   'border border-gray-300 rounded-md px-2 py-1 text-xs w-full focus:outline-none focus:ring-1 focus:ring-orange-500';
 const labelCls = 'block text-xs font-medium text-gray-600 mb-1';
 
+const CAL_HINTS = {
+  frontStroke: 'Fork shaft displacement at each calibration point, measured from full extension (0 mm = fully open) to full compression.',
+  frontVoltage: 'Sensor output voltage at the corresponding fork stroke position, read directly from the potentiometer or hall-effect sensor.',
+  rearShockStroke: 'Shock shaft displacement at each calibration point, measured from full extension (0 mm = shock fully open) to full compression.',
+  rearWheelTravel: 'Corresponding rear wheel vertical travel at the same calibration point. Measure with a ruler or string potentiometer at the axle.',
+  resultCcal: 'Linear calibration gain: stroke_mm = C_cal × (V − V0). Multiply this by (measured voltage minus V0) to obtain fork stroke in mm.',
+  resultV0: 'Sensor voltage at zero fork stroke (fork fully extended). Subtract this from the raw voltage before scaling by C_cal.',
+  resultRmseFront: 'Root-mean-square residual of the linear fit in mm. Lower is better; values above ~1 mm suggest a non-linear sensor or data entry errors.',
+  resultA: 'Quadratic coefficient in the linkage polynomial: wheel_travel = a·s² + b·s + c. Captures progressive or regressive motion-ratio behaviour.',
+  resultB: 'Linear coefficient in the linkage polynomial. A value near 1.0 means a nearly 1:1 motion ratio across the stroke.',
+  resultC: 'Constant offset in the linkage polynomial. Should be close to 0 when calibrated from zero shock stroke.',
+  resultRmseRear: 'Root-mean-square residual of the polynomial fit in mm. Lower is better; values above ~2 mm suggest poor calibration data or a more complex linkage.',
+};
+
+const FIELD_HINTS: Partial<Record<keyof BikeProfile, string>> = {
+  name: 'Human-readable bike name shown in profile lists and session headers.',
+  slug: 'Unique machine identifier used in file paths and API calls (lowercase, alphanumeric, underscores). Cannot be changed after creation.',
+  w_max_front_mm: 'Maximum front wheel travel from full extension to full compression, in millimetres. Used to normalise the travel histogram.',
+  w_max_rear_mm: 'Maximum rear wheel travel from full extension to full compression, in millimetres. Used to normalise the travel histogram.',
+  fork_angle_deg: 'Fork axis angle measured from vertical (head angle). Used to project fork stroke to vertical wheel travel via cos(angle).',
+  c_front: 'Linear calibration gain for the front sensor: stroke_mm = C_front × (V − V0_front). Set automatically by running Front Fork Calibration.',
+  v0_front: 'Sensor voltage at zero front stroke (fork fully extended). Set automatically by running Front Fork Calibration.',
+  c_rear: 'Linear scale factor for the raw rear sensor signal before the quadratic linkage mapping is applied.',
+  v0_rear: 'Sensor voltage at zero rear shock displacement (shock fully extended).',
+  linkage_a: 'Quadratic coefficient in the rear linkage polynomial: wheel_travel = A·s² + B·s + C. Set by Rear Linkage Calibration.',
+  linkage_b: 'Linear coefficient in the rear linkage polynomial. A value near 1.0 indicates a near-linear motion ratio.',
+  linkage_c: 'Constant offset in the rear linkage polynomial (ideally ≈ 0 when calibrated at zero shock stroke).',
+  adc_bits: 'Analog-to-digital converter resolution in bits (e.g. 12 bits → 4096 counts). Must match the DAQ firmware setting.',
+  v_ref: 'ADC reference voltage in volts — the full-scale voltage mapped across all ADC counts. Must match the hardware configuration.',
+  fs_hz: 'Data acquisition sampling frequency in Hz. Must match the firmware logging rate exactly.',
+  lpf_cutoff_disp_hz: 'Low-pass filter cutoff frequency for displacement signals (Hz). Attenuates sensor noise above this frequency.',
+  lpf_cutoff_gyro_hz: 'Low-pass filter cutoff frequency for the gyroscope signal (Hz).',
+  complementary_alpha: 'Complementary filter weight α (0–1). Higher values trust gyro integration more; lower values rely more on accelerometer tilt estimate. Typical: 0.98.',
+  stationary_samples: 'Number of initial samples averaged to estimate gyro bias. The bike must be completely stationary for this many samples at power-on.',
+  gyro_sensitivity: 'Gyroscope sensitivity in LSB per °/s from the IMU datasheet (e.g. 131 for MPU-6050 at ±250 °/s full-scale range).',
+  accel_sensitivity: 'Accelerometer sensitivity in LSB per g from the IMU datasheet (e.g. 16384 for MPU-6050 at ±2 g full-scale range).',
+  ls_threshold_mm_s: 'Velocity threshold in mm/s separating the low-speed and high-speed damping zones in histograms and diagnostics.',
+};
+
 function NumericInput({
   label,
+  hint,
   value,
   onChange,
 }: {
   label: string;
+  hint?: string;
   value: number;
   onChange: (v: number) => void;
 }) {
   return (
     <div>
-      <label className={labelCls}>{label}</label>
+      <label className={labelCls} title={hint}>{label}</label>
       <input
         className={inputCls}
         type="number"
         step="any"
         value={value}
+        title={hint}
         onChange={(e) => onChange(Number(e.target.value))}
       />
     </div>
@@ -229,6 +271,7 @@ export default function CalibratePage() {
     ['ls_threshold_mm_s', 'LS threshold (mm/s)'],
   ];
 
+
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       <h1 className="text-xl font-semibold text-gray-900">Calibrate</h1>
@@ -253,8 +296,8 @@ export default function CalibratePage() {
           <table className="w-full text-xs mb-2 border-collapse">
             <thead>
               <tr className="text-gray-500 border-b border-gray-100">
-                <th className="text-left py-1 pr-2">Stroke (mm)</th>
-                <th className="text-left py-1">Voltage (V)</th>
+                <th className="text-left py-1 pr-2" title={CAL_HINTS.frontStroke}>Stroke (mm)</th>
+                <th className="text-left py-1" title={CAL_HINTS.frontVoltage}>Voltage (V)</th>
               </tr>
             </thead>
             <tbody>
@@ -309,29 +352,34 @@ export default function CalibratePage() {
 
           {frontResult && (
             <div className="bg-orange-50 border border-orange-200 rounded-md p-3 text-xs space-y-1 mb-3">
-              <p><span className="font-medium">C_cal:</span> {frontResult.c_cal.toFixed(4)}</p>
-              <p><span className="font-medium">V0:</span> {frontResult.v0.toFixed(4)} V</p>
-              <p><span className="font-medium">RMSE:</span> {frontResult.rmse.toFixed(4)} mm</p>
+              <p><span className="font-medium" title={CAL_HINTS.resultCcal}>C_cal:</span> {frontResult.c_cal.toFixed(4)}</p>
+              <p><span className="font-medium" title={CAL_HINTS.resultV0}>V0:</span> {frontResult.v0.toFixed(4)} V</p>
+              <p><span className="font-medium" title={CAL_HINTS.resultRmseFront}>RMSE:</span> {frontResult.rmse.toFixed(4)} mm</p>
             </div>
           )}
 
           {frontResult && (
-            <div className="flex gap-2 items-center">
-              <select
-                value={selectedSlugForFront}
-                onChange={(e) => setSelectedSlugForFront(e.target.value)}
-                className="flex-1 border border-gray-300 rounded-md px-2 py-1 text-xs"
-              >
-                <option value="">Select bike…</option>
-                {bikes.map((b) => <option key={b.slug} value={b.slug}>{b.name}</option>)}
-              </select>
-              <button
-                onClick={handleApplyFront}
-                disabled={!selectedSlugForFront}
-                className="px-3 py-1 bg-gray-800 text-white rounded-md text-xs hover:bg-gray-700 disabled:opacity-40"
-              >
-                Apply
-              </button>
+            <div>
+              <p className="text-xs text-gray-500 mb-1">
+                Save <span className="font-medium text-gray-700">C_front</span> and <span className="font-medium text-gray-700">V0_front</span> to a bike profile:
+              </p>
+              <div className="flex gap-2 items-center">
+                <select
+                  value={selectedSlugForFront}
+                  onChange={(e) => setSelectedSlugForFront(e.target.value)}
+                  className="flex-1 border border-gray-300 rounded-md px-2 py-1 text-xs"
+                >
+                  <option value="">Select profile…</option>
+                  {bikes.map((b) => <option key={b.slug} value={b.slug}>{b.name}</option>)}
+                </select>
+                <button
+                  onClick={handleApplyFront}
+                  disabled={!selectedSlugForFront}
+                  className="px-3 py-1 bg-gray-800 text-white rounded-md text-xs hover:bg-gray-700 disabled:opacity-40"
+                >
+                  Apply
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -354,8 +402,8 @@ export default function CalibratePage() {
           <table className="w-full text-xs mb-2 border-collapse">
             <thead>
               <tr className="text-gray-500 border-b border-gray-100">
-                <th className="text-left py-1 pr-2">Shock stroke (mm)</th>
-                <th className="text-left py-1">Wheel travel (mm)</th>
+                <th className="text-left py-1 pr-2" title={CAL_HINTS.rearShockStroke}>Shock stroke (mm)</th>
+                <th className="text-left py-1" title={CAL_HINTS.rearWheelTravel}>Wheel travel (mm)</th>
               </tr>
             </thead>
             <tbody>
@@ -410,30 +458,35 @@ export default function CalibratePage() {
 
           {rearResult && (
             <div className="bg-orange-50 border border-orange-200 rounded-md p-3 text-xs space-y-1 mb-3">
-              <p><span className="font-medium">a:</span> {rearResult.a.toFixed(6)}</p>
-              <p><span className="font-medium">b:</span> {rearResult.b.toFixed(6)}</p>
-              <p><span className="font-medium">c:</span> {rearResult.c.toFixed(6)}</p>
-              <p><span className="font-medium">RMSE:</span> {rearResult.rmse.toFixed(4)} mm</p>
+              <p><span className="font-medium" title={CAL_HINTS.resultA}>a:</span> {rearResult.a.toFixed(6)}</p>
+              <p><span className="font-medium" title={CAL_HINTS.resultB}>b:</span> {rearResult.b.toFixed(6)}</p>
+              <p><span className="font-medium" title={CAL_HINTS.resultC}>c:</span> {rearResult.c.toFixed(6)}</p>
+              <p><span className="font-medium" title={CAL_HINTS.resultRmseRear}>RMSE:</span> {rearResult.rmse.toFixed(4)} mm</p>
             </div>
           )}
 
           {rearResult && (
-            <div className="flex gap-2 items-center">
-              <select
-                value={selectedSlugForRear}
-                onChange={(e) => setSelectedSlugForRear(e.target.value)}
-                className="flex-1 border border-gray-300 rounded-md px-2 py-1 text-xs"
-              >
-                <option value="">Select bike…</option>
-                {bikes.map((b) => <option key={b.slug} value={b.slug}>{b.name}</option>)}
-              </select>
-              <button
-                onClick={handleApplyRear}
-                disabled={!selectedSlugForRear}
-                className="px-3 py-1 bg-gray-800 text-white rounded-md text-xs hover:bg-gray-700 disabled:opacity-40"
-              >
-                Apply
-              </button>
+            <div>
+              <p className="text-xs text-gray-500 mb-1">
+                Save <span className="font-medium text-gray-700">Linkage A/B/C</span> to a bike profile:
+              </p>
+              <div className="flex gap-2 items-center">
+                <select
+                  value={selectedSlugForRear}
+                  onChange={(e) => setSelectedSlugForRear(e.target.value)}
+                  className="flex-1 border border-gray-300 rounded-md px-2 py-1 text-xs"
+                >
+                  <option value="">Select profile…</option>
+                  {bikes.map((b) => <option key={b.slug} value={b.slug}>{b.name}</option>)}
+                </select>
+                <button
+                  onClick={handleApplyRear}
+                  disabled={!selectedSlugForRear}
+                  className="px-3 py-1 bg-gray-800 text-white rounded-md text-xs hover:bg-gray-700 disabled:opacity-40"
+                >
+                  Apply
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -507,20 +560,22 @@ export default function CalibratePage() {
             </h3>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className={labelCls}>Name</label>
+                <label className={labelCls} title={FIELD_HINTS.name}>Name</label>
                 <input
                   className={inputCls}
                   type="text"
                   value={bikeForm.name}
+                  title={FIELD_HINTS.name}
                   onChange={(e) => setBikeField('name', e.target.value)}
                 />
               </div>
               <div>
-                <label className={labelCls}>Slug</label>
+                <label className={labelCls} title={FIELD_HINTS.slug}>Slug</label>
                 <input
                   className={inputCls}
                   type="text"
                   value={bikeForm.slug}
+                  title={FIELD_HINTS.slug}
                   onChange={(e) => setBikeField('slug', e.target.value)}
                   disabled={!!editingSlug}
                 />
@@ -529,6 +584,7 @@ export default function CalibratePage() {
                 <NumericInput
                   key={key}
                   label={label}
+                  hint={FIELD_HINTS[key]}
                   value={bikeForm[key] as number}
                   onChange={(v) => setBikeField(key, v)}
                 />
