@@ -27,7 +27,8 @@ This directory contains three categories of material:
 These materials are planned but not present in this branch. See the documentation index for available content: [README.md](README.md) or [doc/README.md](README.md).
 
 ## Implementation Notes
-Implementation planning documents are referenced in the design, but the implementation folder is not present in this branch. See [README.md](README.md) for the current available documentation.
+
+- [frontend_testing_plan.md](frontend_testing_plan.md): Test strategy, tooling stack (Vitest + Testing Library + MSW), setup instructions, and a complete catalogue of test cases for every page and component in the React frontend.
 
 ## Recommended Reading Order
 
