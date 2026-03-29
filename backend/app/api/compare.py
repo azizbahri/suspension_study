@@ -5,7 +5,7 @@ from typing import Literal
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from app.models.analysis import AnalysisResult, TravelHistogram, VelocityHistogram
+from app.models.analysis import AnalysisResult
 from app.storage import sessions as session_store
 
 router = APIRouter(prefix="/compare", tags=["compare"])
@@ -20,11 +20,7 @@ class CompareRequest(BaseModel):
 class SessionComparison(BaseModel):
     session_id: str
     session_name: str
-    front_travel: TravelHistogram
-    rear_travel: TravelHistogram
-    front_velocity: VelocityHistogram
-    rear_velocity: VelocityHistogram
-    duration_s: float
+    result: AnalysisResult
 
 
 class CompareResponse(BaseModel):
@@ -54,11 +50,7 @@ def compare_sessions(req: CompareRequest):
             SessionComparison(
                 session_id=sid,
                 session_name=session.name,
-                front_travel=result.front_travel,
-                rear_travel=result.rear_travel,
-                front_velocity=result.front_velocity,
-                rear_velocity=result.rear_velocity,
-                duration_s=result.duration_s,
+                result=result,
             )
         )
 
