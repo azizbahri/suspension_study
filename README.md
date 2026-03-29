@@ -6,10 +6,37 @@ Primary target: **Yamaha Ténéré 700** (T7), with T7 linkage constants pre-pop
 
 ---
 
+## Quick Start
+
+Open two terminal windows from the repository root.
+
+**Terminal 1 — API server:**
+
+```bash
+cd backend
+pip install -e ".[dev]"        # first time only
+uvicorn app.main:app --reload --port 8000
+```
+
+**Terminal 2 — UI:**
+
+```bash
+cd frontend
+npm install                    # first time only
+npm run dev
+```
+
+Open **`http://localhost:5173`** in a browser.
+
+The API must be running for the UI to function. Interactive API docs are at **`http://localhost:8000/docs`**.
+
+---
+
 ## Documentation
 
 Theoretical framework: [doc/foundation/overview.md](doc/foundation/overview.md)  
-Documentation index: [doc/README.md](doc/README.md)
+Documentation index: [doc/README.md](doc/README.md)  
+Frontend test plan: [doc/frontend_testing_plan.md](doc/frontend_testing_plan.md)
 
 ---
 
@@ -51,7 +78,7 @@ Interactive docs: `http://localhost:8000/docs`
 
 ### Run Tests
 
-The test suite uses a hardware simulator that generates physically realistic DAQ CSV files from first principles (forward model → sensor quantization → noise). All 34 tests must pass before the backend is considered healthy.
+The test suite uses a hardware simulator that generates physically realistic DAQ CSV files from first principles (forward model → sensor quantization → noise). All 35 tests must pass before the backend is considered healthy.
 
 ```bash
 cd backend
