@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useSessions } from '../hooks/useSessions';
 import { useAnalyzeSession } from '../hooks/useAnalysis';
@@ -13,6 +13,7 @@ const SEVERITY_ORDER = { critical: 0, warning: 1, info: 2 } as const;
 
 export default function AnalyzePage() {
   const [searchParams] = useSearchParams();
+  // Pre-select from URL param on mount
   const [selectedSessionId, setSelectedSessionId] = useState<string>(
     searchParams.get('session') ?? ''
   );
@@ -22,12 +23,6 @@ export default function AnalyzePage() {
 
   const { data: sessions = [] } = useSessions();
   const { mutateAsync: analyze, isPending } = useAnalyzeSession();
-
-  // Pre-select from URL param
-  useEffect(() => {
-    const id = searchParams.get('session');
-    if (id) setSelectedSessionId(id);
-  }, [searchParams]);
 
   const handleAnalyze = async () => {
     if (!selectedSessionId) return;

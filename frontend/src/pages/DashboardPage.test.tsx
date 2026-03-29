@@ -59,7 +59,7 @@ describe('DashboardPage', () => {
 
   it('navigates to /analyze when Analyze Demo is clicked', async () => {
     const user = userEvent.setup()
-    const { queryClient: _ } = renderWithProviders(<DashboardPage />, { initialPath: '/' })
+    renderWithProviders(<DashboardPage />, { initialPath: '/' })
     await waitFor(() =>
       expect(screen.getByRole('button', { name: /analyze demo/i })).toBeInTheDocument()
     )
