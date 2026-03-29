@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Layout from './components/Layout';
+import DashboardPage from './pages/DashboardPage';
 import ImportPage from './pages/ImportPage';
 import CalibratePage from './pages/CalibratePage';
 import AnalyzePage from './pages/AnalyzePage';
@@ -21,11 +22,12 @@ export default function App() {
       <BrowserRouter>
         <Layout>
           <Routes>
-            <Route path="/" element={<Navigate to="/import" replace />} />
+            <Route path="/" element={<DashboardPage />} />
             <Route path="/import" element={<ImportPage />} />
             <Route path="/calibrate" element={<CalibratePage />} />
             <Route path="/analyze" element={<AnalyzePage />} />
             <Route path="/compare" element={<ComparePage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Layout>
       </BrowserRouter>

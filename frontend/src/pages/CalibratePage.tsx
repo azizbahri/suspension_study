@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { calibrateFront, calibrateRear } from '../api/calibrate';
+import { calibrateFront, calibrateRear, getCalibrationExamples } from '../api/calibrate';
 import type { FrontCalibrationResult, RearCalibrationResult } from '../api/calibrate';
 import { useBikes, useCreateBike, useUpdateBike, useDeleteBike } from '../hooks/useBikes';
 import type { BikeProfile } from '../types/bike';
@@ -108,6 +108,34 @@ export default function CalibratePage() {
     onError: (e: Error) => setRearError(e.message),
   });
 
+  const loadFrontExample = async () => {
+    try {
+      const ex = await getCalibrationExamples();
+      setFrontRows(
+        ex.front_strokes_mm.map((s, i) => ({
+          stroke_mm: String(s),
+          voltage_v: String(ex.front_voltages_v[i]),
+        }))
+      );
+    } catch {
+      // silently ignore — examples are best-effort
+    }
+  };
+
+  const loadRearExample = async () => {
+    try {
+      const ex = await getCalibrationExamples();
+      setRearRows(
+        ex.rear_shock_strokes_mm.map((s, i) => ({
+          shock_stroke_mm: String(s),
+          wheel_travel_mm: String(ex.rear_wheel_travels_mm[i]),
+        }))
+      );
+    } catch {
+      // silently ignore
+    }
+  };
+
   const handleFrontFit = () => {
     setFrontError(null);
     const valid = frontRows.filter((r) => r.stroke_mm !== '' && r.voltage_v !== '');
@@ -205,7 +233,15 @@ export default function CalibratePage() {
       <div className="grid grid-cols-2 gap-6">
         {/* Front Calibration */}
         <div className="bg-white rounded-lg shadow-sm p-5">
-          <h2 className="text-sm font-semibold text-gray-700 mb-1">Front Fork Calibration</h2>
+          <div className="flex items-center justify-between mb-1">
+            <h2 className="text-sm font-semibold text-gray-700">Front Fork Calibration</h2>
+            <button
+              onClick={loadFrontExample}
+              className="text-xs text-orange-500 hover:text-orange-600 font-medium"
+            >
+              Load T7 Example
+            </button>
+          </div>
           <p className="text-xs text-gray-500 mb-4">
             Enter stroke (mm) and voltage (V) pairs from a static calibration sweep.
           </p>
@@ -298,7 +334,15 @@ export default function CalibratePage() {
 
         {/* Rear Calibration */}
         <div className="bg-white rounded-lg shadow-sm p-5">
-          <h2 className="text-sm font-semibold text-gray-700 mb-1">Rear Linkage Calibration</h2>
+          <div className="flex items-center justify-between mb-1">
+            <h2 className="text-sm font-semibold text-gray-700">Rear Linkage Calibration</h2>
+            <button
+              onClick={loadRearExample}
+              className="text-xs text-orange-500 hover:text-orange-600 font-medium"
+            >
+              Load T7 Example
+            </button>
+          </div>
           <p className="text-xs text-gray-500 mb-4">
             Enter shock stroke (mm) and wheel travel (mm) pairs from a sweep.
           </p>

@@ -3,13 +3,15 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import bikes, sessions, calibrate, analyze, compare
+from app.api import bikes, sessions, calibrate, analyze, compare, demo
 from app.storage.bikes import seed_defaults
+from app.storage.demo import seed_demo_data
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     seed_defaults()
+    seed_demo_data()
     yield
 
 
@@ -33,6 +35,7 @@ app.include_router(sessions.router, prefix=_PREFIX)
 app.include_router(calibrate.router, prefix=_PREFIX)
 app.include_router(analyze.router, prefix=_PREFIX)
 app.include_router(compare.router, prefix=_PREFIX)
+app.include_router(demo.router, prefix=_PREFIX)
 
 
 @app.get("/")

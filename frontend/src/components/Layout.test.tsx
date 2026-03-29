@@ -20,13 +20,14 @@ describe('Layout', () => {
     expect(screen.getByTestId('page-content')).toHaveTextContent('hello')
   })
 
-  it('renders all four navigation links', async () => {
+  it('renders all five navigation links', async () => {
     const user = userEvent.setup()
     renderLayout()
     // Expand sidebar so link labels become visible and accessible
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const aside = document.querySelector('aside')!
     await user.hover(aside)
+    expect(screen.getByRole('link', { name: /dashboard/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /import/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /calibrate/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /analyze/i })).toBeInTheDocument()

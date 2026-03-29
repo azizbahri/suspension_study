@@ -1,6 +1,7 @@
 import type { BikeProfile } from '../types/bike'
 import type { Session, ColumnMap } from '../types/session'
 import type { AnalysisResult } from '../types/analysis'
+import type { DemoStatus } from '../api/demo'
 
 // ── Bike ───────────────────────────────────────────────────────────────────
 export const T7_BIKE: BikeProfile = {
@@ -119,3 +120,19 @@ export const ANALYSIS_RESULT: AnalysisResult = {
 // ── Calibration results ──────────────────────────────────────────────────────
 export const FRONT_CAL_RESULT = { c_cal: 42.0, v0: 0.5, rmse: 0.08 }
 export const REAR_CAL_RESULT = { a: -0.015, b: 4.2, c: 0.0, rmse: 0.4 }
+
+// ── Calibration examples ─────────────────────────────────────────────────────
+export const CAL_EXAMPLES = {
+  front_strokes_mm: [0, 50, 100, 150, 200],
+  front_voltages_v: [0.5, 1.6905, 2.881, 4.0714, 5.2619],
+  rear_shock_strokes_mm: [0, 10, 20, 30, 40, 50],
+  rear_wheel_travels_mm: [0, 40.5, 78, 112.5, 144, 172.5],
+}
+
+// ── Demo status ───────────────────────────────────────────────────────────────
+export const DEMO_STATUS: DemoStatus = {
+  session_count: 2,
+  bike_count: 1,
+  analyzed_count: 1,
+  demo_session_id: 'session-1',
+}

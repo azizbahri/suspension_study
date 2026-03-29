@@ -1,6 +1,6 @@
 import { setupServer } from 'msw/node'
 import { http, HttpResponse } from 'msw'
-import { T7_BIKE, SESSION_1, SESSION_2, ANALYSIS_RESULT, FRONT_CAL_RESULT, REAR_CAL_RESULT } from './fixtures'
+import { T7_BIKE, SESSION_1, SESSION_2, ANALYSIS_RESULT, FRONT_CAL_RESULT, REAR_CAL_RESULT, CAL_EXAMPLES, DEMO_STATUS } from './fixtures'
 
 const BASE = 'http://localhost:8000/api/v1'
 
@@ -32,6 +32,7 @@ export const handlers = [
   // Calibrate
   http.post(`${BASE}/calibrate/front`, () => HttpResponse.json(FRONT_CAL_RESULT)),
   http.post(`${BASE}/calibrate/rear`, () => HttpResponse.json(REAR_CAL_RESULT)),
+  http.get(`${BASE}/calibrate/examples`, () => HttpResponse.json(CAL_EXAMPLES)),
 
   // Compare
   http.post(`${BASE}/compare`, () =>
@@ -42,6 +43,9 @@ export const handlers = [
       ],
     })
   ),
+
+  // Demo status
+  http.get(`${BASE}/demo`, () => HttpResponse.json(DEMO_STATUS)),
 ]
 
 export const server = setupServer(...handlers)

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Upload, Sliders, BarChart2, GitCompare, Bike } from 'lucide-react';
+import { Upload, Sliders, BarChart2, GitCompare, Bike, LayoutDashboard } from 'lucide-react';
 import NavLink from './NavLink';
 
 interface LayoutProps {
@@ -31,6 +31,7 @@ export default function Layout({ children }: LayoutProps) {
 
         {/* Nav */}
         <nav className="flex flex-col gap-1 p-2 flex-1">
+          <NavLink to="/" icon={<LayoutDashboard size={18} />} label="Dashboard" expanded={expanded} />
           <NavLink to="/import" icon={<Upload size={18} />} label="Import" expanded={expanded} />
           <NavLink to="/calibrate" icon={<Sliders size={18} />} label="Calibrate" expanded={expanded} />
           <NavLink to="/analyze" icon={<BarChart2 size={18} />} label="Analyze" expanded={expanded} />
