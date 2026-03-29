@@ -85,6 +85,46 @@ cd backend
 python -m pytest tests/ -v
 ```
 
+### Simulate DAQ Data (`daq-simulate`)
+
+The hardware simulator is also available as a standalone command-line tool after `pip install -e ".[dev]"`. Use it to generate realistic CSV files for manual testing, UI development, or any workflow that needs known-scenario data without real hardware.
+
+```bash
+# List all available scenarios
+daq-simulate list
+
+# Bike stationary at sag (default T7 profile, realistic noise)
+daq-simulate static_sag sag.csv
+
+# Hard braking, 15 seconds, no noise (clean signal)
+daq-simulate braking braking.csv --duration 15 --no-noise
+
+# Rough terrain, 60 s, reproducible seed
+daq-simulate rough_terrain rough.csv --duration 60 --seed 7
+
+# Square-edge hit with custom fork calibration constants
+daq-simulate square_edge hit.csv --c-front 38.5 --v0-front 0.55
+
+# Jump and landing, output to specific path
+daq-simulate jump_landing /tmp/jump.csv
+```
+
+Full option reference:
+
+```
+daq-simulate SCENARIO OUTPUT [--duration SECONDS] [--fs HZ]
+             [--noise | --no-noise] [--seed INT]
+             [--front-noise LSB] [--rear-noise LSB]
+             [--gyro-noise COUNTS] [--gyro-bias DEG/S]
+             [--fork-angle DEG] [--c-front MM/V] [--v0-front V]
+             [--c-rear MM/V] [--v0-rear V]
+             [--linkage-a COEF] [--linkage-b COEF] [--linkage-c COEF]
+             [--v-ref V] [--adc-bits BITS]
+             [--gyro-sensitivity LSB/DPS] [--accel-sensitivity LSB/G]
+```
+
+The CSV output matches the DAQ column schema (`time_s`, `front_raw`, `rear_raw`, `gyro_y_raw`, `accel_x_raw`, `accel_y_raw`, `accel_z_raw`) and can be imported directly through the Import page.
+
 ---
 
 ## Frontend
