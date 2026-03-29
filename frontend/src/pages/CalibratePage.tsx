@@ -141,8 +141,8 @@ export default function CalibratePage() {
     const valid = frontRows.filter((r) => r.stroke_mm !== '' && r.voltage_v !== '');
     if (valid.length < 2) { setFrontError('Need at least 2 valid data points'); return; }
     frontMutation.mutate({
-      stroke_mm: valid.map((r) => Number(r.stroke_mm)),
-      voltage_v: valid.map((r) => Number(r.voltage_v)),
+      strokes_mm: valid.map((r) => Number(r.stroke_mm)),
+      voltages_v: valid.map((r) => Number(r.voltage_v)),
     });
   };
 
@@ -151,15 +151,17 @@ export default function CalibratePage() {
     const valid = rearRows.filter((r) => r.shock_stroke_mm !== '' && r.wheel_travel_mm !== '');
     if (valid.length < 2) { setRearError('Need at least 2 valid data points'); return; }
     rearMutation.mutate({
-      shock_stroke_mm: valid.map((r) => Number(r.shock_stroke_mm)),
-      wheel_travel_mm: valid.map((r) => Number(r.wheel_travel_mm)),
+      shock_strokes_mm: valid.map((r) => Number(r.shock_stroke_mm)),
+      wheel_travels_mm: valid.map((r) => Number(r.wheel_travel_mm)),
     });
   };
 
   const handleApplyFront = async () => {
     if (!frontResult || !selectedSlugForFront) return;
+    const existing = bikes.find((b) => b.slug === selectedSlugForFront);
+    if (!existing) { setFrontError('Bike profile no longer exists; please re-select'); return; }
     try {
-      await updateBike.mutateAsync({ slug: selectedSlugForFront, bike: { c_front: frontResult.c_cal, v0_front: frontResult.v0 } });
+      await updateBike.mutateAsync({ slug: selectedSlugForFront, bike: { ...existing, c_front: frontResult.c_cal, v0_front: frontResult.v0 } });
     } catch (e) {
       setFrontError(e instanceof Error ? e.message : 'Failed to apply');
     }
@@ -167,8 +169,10 @@ export default function CalibratePage() {
 
   const handleApplyRear = async () => {
     if (!rearResult || !selectedSlugForRear) return;
+    const existing = bikes.find((b) => b.slug === selectedSlugForRear);
+    if (!existing) { setRearError('Bike profile no longer exists; please re-select'); return; }
     try {
-      await updateBike.mutateAsync({ slug: selectedSlugForRear, bike: { linkage_a: rearResult.a, linkage_b: rearResult.b, linkage_c: rearResult.c } });
+      await updateBike.mutateAsync({ slug: selectedSlugForRear, bike: { ...existing, linkage_a: rearResult.a, linkage_b: rearResult.b, linkage_c: rearResult.c } });
     } catch (e) {
       setRearError(e instanceof Error ? e.message : 'Failed to apply');
     }

@@ -8,7 +8,11 @@ export const client = axios.create({
 client.interceptors.response.use(
   (r) => r,
   (err) => {
-    const msg = err.response?.data?.detail ?? err.message;
-    return Promise.reject(new Error(String(msg)));
+    const detail = err.response?.data?.detail ?? err.message;
+    // FastAPI validation errors come back as an array of {loc, msg, type} objects.
+    const msg = Array.isArray(detail)
+      ? detail.map((e: { msg?: string }) => e.msg ?? String(e)).join('; ')
+      : String(detail);
+    return Promise.reject(new Error(msg));
   }
 );

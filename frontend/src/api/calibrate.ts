@@ -1,8 +1,8 @@
 import { client } from './client';
 
 export interface FrontCalibrationPayload {
-  stroke_mm: number[];
-  voltage_v: number[];
+  strokes_mm: number[];
+  voltages_v: number[];
 }
 
 export interface FrontCalibrationResult {
@@ -12,8 +12,8 @@ export interface FrontCalibrationResult {
 }
 
 export interface RearCalibrationPayload {
-  shock_stroke_mm: number[];
-  wheel_travel_mm: number[];
+  shock_strokes_mm: number[];
+  wheel_travels_mm: number[];
 }
 
 export interface RearCalibrationResult {
