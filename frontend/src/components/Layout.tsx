@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Upload, Sliders, BarChart2, GitCompare, Bike, LayoutDashboard } from 'lucide-react';
+import { Upload, Sliders, BarChart2, GitCompare, LayoutDashboard } from 'lucide-react';
 import NavLink from './NavLink';
+import logo from '../assets/logo.svg';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -21,7 +22,7 @@ export default function Layout({ children }: LayoutProps) {
       >
         {/* Logo */}
         <div className="flex items-center gap-3 px-4 py-5 border-b border-gray-800 overflow-hidden">
-          <Bike className="w-6 h-6 text-orange-500 flex-shrink-0" />
+          <img src={logo} alt="Suspension Study" className="w-7 h-7 flex-shrink-0" />
           {expanded && (
             <span className="text-white font-semibold text-sm whitespace-nowrap">
               Suspension Study

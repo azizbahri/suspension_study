@@ -1,0 +1,148 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="logo-clip">
+      <circle cx="200" cy="200" r="185"/>
+    </clipPath>
+  </defs>
+
+  <!-- Outer ring border layers -->
+  <circle cx="200" cy="200" r="199" fill="#6B4410"/>
+  <circle cx="200" cy="200" r="195" fill="#C8941A"/>
+  <circle cx="200" cy="200" r="191" fill="#A07020"/>
+  <circle cx="200" cy="200" r="188" fill="#D9B045"/>
+  <circle cx="200" cy="200" r="185" fill="#7A5010"/>
+  <circle cx="200" cy="200" r="183" fill="#F0E8D0"/>
+
+  <g clip-path="url(#logo-clip)">
+    <!-- Cream sky background -->
+    <rect width="400" height="400" fill="#F0E8D0"/>
+
+    <!-- ── FAR MOUNTAINS ── -->
+
+    <!-- Centre peak (lightest / farthest) -->
+    <polygon points="200,26 128,195 272,195" fill="#D4BF85"/>
+    <!-- Left face of centre peak (slightly darker) -->
+    <polygon points="200,26 128,195 172,195" fill="#C4AD72"/>
+    <!-- Right shoulder (slightly darker) -->
+    <polygon points="200,26 228,195 272,195" fill="#C4AD72"/>
+    <!-- Snow patches -->
+    <polygon points="200,26 184,80 216,80" fill="#F5EDDB"/>
+    <polygon points="184,80 200,26 152,118" fill="#F5EDDB"/>
+    <polygon points="216,80 200,26 248,122" fill="#EFE8D2"/>
+
+    <!-- Left mid-mountain -->
+    <polygon points="12,218 108,78 200,185 140,218" fill="#B89240"/>
+    <polygon points="108,78 144,114 200,185 108,162" fill="#A88230"/>
+
+    <!-- Right mid-mountain -->
+    <polygon points="200,172 302,70 398,190 385,218 200,218" fill="#B89240"/>
+    <polygon points="302,70 348,118 398,190 322,182" fill="#C4A050"/>
+
+    <!-- ── ROCKY TERRAIN ── -->
+
+    <!-- Right cliff (main) -->
+    <polygon points="265,208 328,150 392,168 400,200 400,325 288,358 265,312" fill="#6B4418"/>
+    <polygon points="328,150 378,140 400,158 400,188 368,178 328,198" fill="#8B5A28"/>
+    <!-- Ledge where ibex stands -->
+    <polygon points="300,144 372,136 392,150 356,163 300,163" fill="#4A2C0E"/>
+
+    <!-- Right cliff lower base -->
+    <polygon points="252,298 400,272 400,400 252,400" fill="#3D2008"/>
+
+    <!-- Left foreground slope -->
+    <polygon points="0,248 248,218 268,312 268,400 0,400" fill="#5C3818"/>
+    <!-- Left deep shadow -->
+    <polygon points="0,272 158,256 118,400 0,400" fill="#2C1808"/>
+    <!-- Rocky outcrops on slope -->
+    <polygon points="148,224 208,218 232,258 190,274 144,260" fill="#4A2C0E"/>
+    <polygon points="88,256 142,248 132,282 84,280" fill="#4A2C0E"/>
+
+    <!-- ── RIVER / STREAM ── -->
+    <path d="M 12,358 Q 64,336 110,348 Q 152,362 190,346 Q 216,334 232,322"
+          stroke="#D4C088" stroke-width="9" fill="none" stroke-linecap="round"/>
+    <path d="M 12,358 Q 64,336 110,348 Q 152,362 190,346 Q 216,334 232,322"
+          stroke="#F0E8D0" stroke-width="5" fill="none" stroke-linecap="round"/>
+
+    <!-- ── ADVENTURE MOTORCYCLE + RIDER ── -->
+    <!-- Tilted ~22 ° nose-up, climbing the rocky slope -->
+    <g transform="translate(116,240) rotate(-22)">
+      <!-- Rear wheel -->
+      <circle cx="8"  cy="24" r="24" fill="#2C1808"/>
+      <circle cx="8"  cy="24" r="13" fill="#4A2C0E"/>
+      <circle cx="8"  cy="24" r="5"  fill="#2C1808"/>
+
+      <!-- Front wheel -->
+      <circle cx="96" cy="28" r="22" fill="#2C1808"/>
+      <circle cx="96" cy="28" r="12" fill="#4A2C0E"/>
+      <circle cx="96" cy="28" r="4"  fill="#2C1808"/>
+
+      <!-- Swingarm -->
+      <polygon points="8,12 36,6 41,14 12,19" fill="#2C1808"/>
+
+      <!-- Main frame body -->
+      <polygon points="28,2 65,-9 82,1 96,12 76,20 33,18" fill="#2C1808"/>
+      <!-- Engine block -->
+      <rect x="30" y="7" width="36" height="20" rx="3" fill="#2C1808"/>
+      <!-- Fuel tank -->
+      <polygon points="30,2 60,-9 68,-2 36,5" fill="#2C1808"/>
+
+      <!-- Front fork -->
+      <polygon points="76,-3 87,0 96,12 96,20 84,18 76,7" fill="#2C1808"/>
+      <!-- Windshield -->
+      <polygon points="72,-5 80,-17 86,-12 80,-2" fill="#2C1808"/>
+
+      <!-- High-mount exhaust -->
+      <path d="M 44,22 Q 64,31 86,20 Q 96,14 98,8"
+            stroke="#2C1808" stroke-width="5" fill="none" stroke-linecap="round"/>
+
+      <!-- Rear pannier (left/outer) -->
+      <rect x="-14" y="1"  width="22" height="24" rx="3" fill="#2C1808"/>
+      <!-- Rear pannier (right/inner, partially behind) -->
+      <rect x="-9"  y="5"  width="15" height="17" rx="2" fill="#3D2010"/>
+
+      <!-- Tank bag -->
+      <rect x="42" y="-5" width="19" height="13" rx="2" fill="#2C1808"/>
+
+      <!-- Rider – lower body / pelvis -->
+      <polygon points="33,-2 53,-4 55,8 35,9" fill="#2C1808"/>
+      <!-- Rider – torso (slight forward lean) -->
+      <polygon points="37,-4 55,-27 65,-19 55,-3" fill="#2C1808"/>
+      <!-- Rider – arm to handlebar -->
+      <polygon points="53,-23 74,-11 72,-4 51,-14" fill="#2C1808"/>
+      <!-- Rider – helmet -->
+      <ellipse cx="55" cy="-34" rx="14" ry="15" fill="#2C1808"/>
+      <!-- Helmet visor crease -->
+      <path d="M 44,-31 Q 55,-25 66,-31" stroke="#3D2010" stroke-width="2" fill="none"/>
+    </g>
+
+    <!-- ── IBEX SILHOUETTE (upper-right cliff) ── -->
+    <g transform="translate(300,112)">
+      <!-- Body -->
+      <ellipse cx="28" cy="30" rx="28" ry="14" fill="#2C1808"/>
+      <!-- Neck -->
+      <polygon points="44,18 54,4 61,18 52,27" fill="#2C1808"/>
+      <!-- Head -->
+      <ellipse cx="57" cy="6" rx="12" ry="11" fill="#2C1808"/>
+      <!-- Muzzle -->
+      <polygon points="63,10 72,13 68,20 60,16" fill="#2C1808"/>
+
+      <!-- Large curved horn (primary) -->
+      <path d="M 57,-3 Q 73,-24 64,-43 Q 57,-23 52,-5" fill="#2C1808"/>
+      <!-- Second horn (offset behind) -->
+      <path d="M 61,-2 Q 76,-17 69,-34 Q 62,-18 57,-3" fill="#2C1808" opacity="0.75"/>
+
+      <!-- Front legs -->
+      <rect x="12" y="41" width="7" height="24" rx="3" fill="#2C1808"/>
+      <rect x="23" y="41" width="7" height="24" rx="3" fill="#2C1808"/>
+      <!-- Back legs -->
+      <rect x="39" y="41" width="7" height="22" rx="3" fill="#2C1808"/>
+      <rect x="50" y="41" width="7" height="22" rx="3" fill="#2C1808"/>
+      <!-- Tail stub -->
+      <ellipse cx="4" cy="26" rx="5" ry="8" fill="#2C1808"/>
+    </g>
+  </g>
+
+  <!-- Inner ring strokes (drawn on top of content) -->
+  <circle cx="200" cy="200" r="185" fill="none" stroke="#C4911F" stroke-width="2.5"/>
+  <circle cx="200" cy="200" r="181" fill="none" stroke="#E8CE60" stroke-width="0.8" opacity="0.55"/>
+</svg>

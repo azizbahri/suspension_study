@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Bike, Upload, Sliders, BarChart2, GitCompare, PlayCircle } from 'lucide-react';
+import { Upload, Sliders, BarChart2, GitCompare, PlayCircle } from 'lucide-react';
 import { getDemoStatus } from '../api/demo';
+import logo from '../assets/logo.svg';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -45,18 +46,30 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">
-      {/* Hero */}
-      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-8 flex items-center gap-6">
-        <div className="w-14 h-14 bg-orange-500 rounded-xl flex items-center justify-center flex-shrink-0">
-          <Bike className="text-white" size={30} />
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold text-white">Suspension Study</h1>
-          <p className="text-gray-400 mt-1 text-sm leading-relaxed">
-            Motorcycle suspension DAQ post-processor — import a ride CSV, calibrate sensor
-            transfer functions, and get data-driven tuning advice from travel and velocity
-            histograms.
-          </p>
+      {/* Hero banner */}
+      <div className="relative bg-gradient-to-br from-[#160C03] via-[#2C1808] to-[#4A2C0E] rounded-2xl p-8 overflow-hidden">
+        {/* Decorative rings echoing the logo border */}
+        <div className="absolute -right-20 -top-20 w-72 h-72 rounded-full border-2 border-[#C8941A] opacity-10 pointer-events-none" />
+        <div className="absolute -right-10 -top-10 w-52 h-52 rounded-full border border-[#D9B045] opacity-10 pointer-events-none" />
+
+        <div className="relative z-10 flex items-center gap-8">
+          {/* Logo */}
+          <div className="flex-shrink-0 drop-shadow-2xl">
+            <img src={logo} alt="Suspension Study logo" className="w-40 h-40" />
+          </div>
+
+          {/* Text block */}
+          <div className="flex-1 min-w-0">
+            <h1 className="text-3xl font-bold text-[#D4A843] tracking-tight leading-tight">
+              Suspension Study
+            </h1>
+            <div className="w-14 h-0.5 bg-[#C8941A] mt-2 mb-3 rounded-full" />
+            <p className="text-[#D4BF85] text-sm leading-relaxed">
+              Adventure motorcycle suspension DAQ post-processor — import a ride CSV,
+              calibrate your sensor transfer functions, and get data-driven tuning
+              insights from travel histograms, velocity histograms, and pitch telemetry.
+            </p>
+          </div>
         </div>
       </div>
 
