@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { Info } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import { calibrateFront, calibrateRear, getCalibrationExamples } from '../api/calibrate';
 import type { FrontCalibrationResult, RearCalibrationResult } from '../api/calibrate';
 import { useBikes, useCreateBike, useUpdateBike, useDeleteBike } from '../hooks/useBikes';
 import type { BikeProfile } from '../types/bike';
+import CalibrateInfoSidebar, { type CalibrateInfoKey } from '../components/CalibrateInfoSidebar';
 
 type FrontRow = { stroke_mm: string; voltage_v: string };
 type RearRow = { shock_stroke_mm: string; wheel_travel_mm: string };
@@ -49,65 +51,41 @@ const inputCls =
   'border border-gray-300 rounded-md px-2 py-1 text-xs w-full focus:outline-none focus:ring-1 focus:ring-orange-500';
 const labelCls = 'block text-xs font-medium text-gray-600 mb-1';
 
-const CAL_HINTS = {
-  frontStroke: 'Fork shaft displacement at each calibration point, measured from full extension (0 mm = fully open) to full compression.',
-  frontVoltage: 'Sensor output voltage at the corresponding fork stroke position, read directly from the potentiometer or hall-effect sensor.',
-  rearShockStroke: 'Shock shaft displacement at each calibration point, measured from full extension (0 mm = shock fully open) to full compression.',
-  rearWheelTravel: 'Corresponding rear wheel vertical travel at the same calibration point. Measure with a ruler or string potentiometer at the axle.',
-  resultCcal: 'Linear calibration gain: stroke_mm = C_cal × (V − V0). Multiply this by (measured voltage minus V0) to obtain fork stroke in mm.',
-  resultV0: 'Sensor voltage at zero fork stroke (fork fully extended). Subtract this from the raw voltage before scaling by C_cal.',
-  resultRmseFront: 'Root-mean-square residual of the linear fit in mm. Lower is better; values above ~1 mm suggest a non-linear sensor or data entry errors.',
-  resultA: 'Quadratic coefficient in the linkage polynomial: wheel_travel = a·s² + b·s + c. Captures progressive or regressive motion-ratio behaviour.',
-  resultB: 'Linear coefficient in the linkage polynomial. A value near 1.0 means a nearly 1:1 motion ratio across the stroke.',
-  resultC: 'Constant offset in the linkage polynomial. Should be close to 0 when calibrated from zero shock stroke.',
-  resultRmseRear: 'Root-mean-square residual of the polynomial fit in mm. Lower is better; values above ~2 mm suggest poor calibration data or a more complex linkage.',
-};
-
-const FIELD_HINTS: Partial<Record<keyof BikeProfile, string>> = {
-  name: 'Human-readable bike name shown in profile lists and session headers.',
-  slug: 'Unique machine identifier used in file paths and API calls (lowercase, alphanumeric, underscores). Cannot be changed after creation.',
-  w_max_front_mm: 'Maximum front wheel travel from full extension to full compression, in millimetres. Used to normalise the travel histogram.',
-  w_max_rear_mm: 'Maximum rear wheel travel from full extension to full compression, in millimetres. Used to normalise the travel histogram.',
-  fork_angle_deg: 'Fork axis angle measured from vertical (head angle). Used to project fork stroke to vertical wheel travel via cos(angle).',
-  c_front: 'Linear calibration gain for the front sensor: stroke_mm = C_front × (V − V0_front). Set automatically by running Front Fork Calibration.',
-  v0_front: 'Sensor voltage at zero front stroke (fork fully extended). Set automatically by running Front Fork Calibration.',
-  c_rear: 'Linear scale factor for the raw rear sensor signal before the quadratic linkage mapping is applied.',
-  v0_rear: 'Sensor voltage at zero rear shock displacement (shock fully extended).',
-  linkage_a: 'Quadratic coefficient in the rear linkage polynomial: wheel_travel = A·s² + B·s + C. Set by Rear Linkage Calibration.',
-  linkage_b: 'Linear coefficient in the rear linkage polynomial. A value near 1.0 indicates a near-linear motion ratio.',
-  linkage_c: 'Constant offset in the rear linkage polynomial (ideally ≈ 0 when calibrated at zero shock stroke).',
-  adc_bits: 'Analog-to-digital converter resolution in bits (e.g. 12 bits → 4096 counts). Must match the DAQ firmware setting.',
-  v_ref: 'ADC reference voltage in volts — the full-scale voltage mapped across all ADC counts. Must match the hardware configuration.',
-  fs_hz: 'Data acquisition sampling frequency in Hz. Must match the firmware logging rate exactly.',
-  lpf_cutoff_disp_hz: 'Low-pass filter cutoff frequency for displacement signals (Hz). Attenuates sensor noise above this frequency.',
-  lpf_cutoff_gyro_hz: 'Low-pass filter cutoff frequency for the gyroscope signal (Hz).',
-  complementary_alpha: 'Complementary filter weight α (0–1). Higher values trust gyro integration more; lower values rely more on accelerometer tilt estimate. Typical: 0.98.',
-  stationary_samples: 'Number of initial samples averaged to estimate gyro bias. The bike must be completely stationary for this many samples at power-on.',
-  gyro_sensitivity: 'Gyroscope sensitivity in LSB per °/s from the IMU datasheet (e.g. 131 for MPU-6050 at ±250 °/s full-scale range).',
-  accel_sensitivity: 'Accelerometer sensitivity in LSB per g from the IMU datasheet (e.g. 16384 for MPU-6050 at ±2 g full-scale range).',
-  ls_threshold_mm_s: 'Velocity threshold in mm/s separating the low-speed and high-speed damping zones in histograms and diagnostics.',
-};
+function InfoButton({ onClick, label }: { onClick: () => void; label: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="ml-1 inline-flex items-center text-gray-400 hover:text-orange-500 transition-colors"
+      aria-label={`More info about ${label}`}
+    >
+      <Info size={11} />
+    </button>
+  );
+}
 
 function NumericInput({
   label,
-  hint,
+  onInfo,
   value,
   onChange,
 }: {
   label: string;
-  hint?: string;
+  onInfo?: () => void;
   value: number;
   onChange: (v: number) => void;
 }) {
   return (
     <div>
-      <label className={labelCls} title={hint}>{label}</label>
+      <label className={labelCls}>
+        {label}
+        {onInfo && <InfoButton onClick={onInfo} label={label} />}
+      </label>
       <input
         className={inputCls}
         type="number"
         step="any"
         value={value}
-        title={hint}
         onChange={(e) => onChange(Number(e.target.value))}
       />
     </div>
@@ -119,6 +97,9 @@ export default function CalibratePage() {
   const createBike = useCreateBike();
   const updateBike = useUpdateBike();
   const deleteBike = useDeleteBike();
+
+  // Info sidebar state
+  const [activeInfoKey, setActiveInfoKey] = useState<CalibrateInfoKey | null>(null);
 
   // Front calibration state
   const [frontRows, setFrontRows] = useState<FrontRow[]>(emptyFrontRows());
@@ -273,11 +254,12 @@ export default function CalibratePage() {
 
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
-      <h1 className="text-xl font-semibold text-gray-900">Calibrate</h1>
+    <>
+      <div className="max-w-5xl mx-auto space-y-6">
+        <h1 className="text-xl font-semibold text-gray-900">Calibrate</h1>
 
-      {/* Two-column calibration panels */}
-      <div className="grid grid-cols-2 gap-6">
+        {/* Two-column calibration panels */}
+        <div className="grid grid-cols-2 gap-6">
         {/* Front Calibration */}
         <div className="bg-white rounded-lg shadow-sm p-5">
           <div className="flex items-center justify-between mb-1">
@@ -296,8 +278,14 @@ export default function CalibratePage() {
           <table className="w-full text-xs mb-2 border-collapse">
             <thead>
               <tr className="text-gray-500 border-b border-gray-100">
-                <th className="text-left py-1 pr-2" title={CAL_HINTS.frontStroke}>Stroke (mm)</th>
-                <th className="text-left py-1" title={CAL_HINTS.frontVoltage}>Voltage (V)</th>
+                <th className="text-left py-1 pr-2">
+                  Stroke (mm)
+                  <InfoButton onClick={() => setActiveInfoKey('front_stroke')} label="Stroke (mm)" />
+                </th>
+                <th className="text-left py-1">
+                  Voltage (V)
+                  <InfoButton onClick={() => setActiveInfoKey('front_voltage')} label="Voltage (V)" />
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -352,9 +340,21 @@ export default function CalibratePage() {
 
           {frontResult && (
             <div className="bg-orange-50 border border-orange-200 rounded-md p-3 text-xs space-y-1 mb-3">
-              <p><span className="font-medium" title={CAL_HINTS.resultCcal}>C_cal:</span> {frontResult.c_cal.toFixed(4)}</p>
-              <p><span className="font-medium" title={CAL_HINTS.resultV0}>V0:</span> {frontResult.v0.toFixed(4)} V</p>
-              <p><span className="font-medium" title={CAL_HINTS.resultRmseFront}>RMSE:</span> {frontResult.rmse.toFixed(4)} mm</p>
+              <p>
+                <span className="font-medium">C_cal:</span>
+                <InfoButton onClick={() => setActiveInfoKey('result_c_cal')} label="C_cal" />
+                {' '}{frontResult.c_cal.toFixed(4)}
+              </p>
+              <p>
+                <span className="font-medium">V0:</span>
+                <InfoButton onClick={() => setActiveInfoKey('result_v0')} label="V0" />
+                {' '}{frontResult.v0.toFixed(4)} V
+              </p>
+              <p>
+                <span className="font-medium">RMSE:</span>
+                <InfoButton onClick={() => setActiveInfoKey('result_rmse_front')} label="RMSE" />
+                {' '}{frontResult.rmse.toFixed(4)} mm
+              </p>
             </div>
           )}
 
@@ -402,8 +402,14 @@ export default function CalibratePage() {
           <table className="w-full text-xs mb-2 border-collapse">
             <thead>
               <tr className="text-gray-500 border-b border-gray-100">
-                <th className="text-left py-1 pr-2" title={CAL_HINTS.rearShockStroke}>Shock stroke (mm)</th>
-                <th className="text-left py-1" title={CAL_HINTS.rearWheelTravel}>Wheel travel (mm)</th>
+                <th className="text-left py-1 pr-2">
+                  Shock stroke (mm)
+                  <InfoButton onClick={() => setActiveInfoKey('rear_shock_stroke')} label="Shock stroke (mm)" />
+                </th>
+                <th className="text-left py-1">
+                  Wheel travel (mm)
+                  <InfoButton onClick={() => setActiveInfoKey('rear_wheel_travel')} label="Wheel travel (mm)" />
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -458,10 +464,26 @@ export default function CalibratePage() {
 
           {rearResult && (
             <div className="bg-orange-50 border border-orange-200 rounded-md p-3 text-xs space-y-1 mb-3">
-              <p><span className="font-medium" title={CAL_HINTS.resultA}>a:</span> {rearResult.a.toFixed(6)}</p>
-              <p><span className="font-medium" title={CAL_HINTS.resultB}>b:</span> {rearResult.b.toFixed(6)}</p>
-              <p><span className="font-medium" title={CAL_HINTS.resultC}>c:</span> {rearResult.c.toFixed(6)}</p>
-              <p><span className="font-medium" title={CAL_HINTS.resultRmseRear}>RMSE:</span> {rearResult.rmse.toFixed(4)} mm</p>
+              <p>
+                <span className="font-medium">a:</span>
+                <InfoButton onClick={() => setActiveInfoKey('result_a')} label="a" />
+                {' '}{rearResult.a.toFixed(6)}
+              </p>
+              <p>
+                <span className="font-medium">b:</span>
+                <InfoButton onClick={() => setActiveInfoKey('result_b')} label="b" />
+                {' '}{rearResult.b.toFixed(6)}
+              </p>
+              <p>
+                <span className="font-medium">c:</span>
+                <InfoButton onClick={() => setActiveInfoKey('result_c')} label="c" />
+                {' '}{rearResult.c.toFixed(6)}
+              </p>
+              <p>
+                <span className="font-medium">RMSE:</span>
+                <InfoButton onClick={() => setActiveInfoKey('result_rmse_rear')} label="RMSE" />
+                {' '}{rearResult.rmse.toFixed(4)} mm
+              </p>
             </div>
           )}
 
@@ -560,22 +582,26 @@ export default function CalibratePage() {
             </h3>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className={labelCls} title={FIELD_HINTS.name}>Name</label>
+                <label className={labelCls}>
+                  Name
+                  <InfoButton onClick={() => setActiveInfoKey('name')} label="Name" />
+                </label>
                 <input
                   className={inputCls}
                   type="text"
                   value={bikeForm.name}
-                  title={FIELD_HINTS.name}
                   onChange={(e) => setBikeField('name', e.target.value)}
                 />
               </div>
               <div>
-                <label className={labelCls} title={FIELD_HINTS.slug}>Slug</label>
+                <label className={labelCls}>
+                  Slug
+                  <InfoButton onClick={() => setActiveInfoKey('slug')} label="Slug" />
+                </label>
                 <input
                   className={inputCls}
                   type="text"
                   value={bikeForm.slug}
-                  title={FIELD_HINTS.slug}
                   onChange={(e) => setBikeField('slug', e.target.value)}
                   disabled={!!editingSlug}
                 />
@@ -584,7 +610,7 @@ export default function CalibratePage() {
                 <NumericInput
                   key={key}
                   label={label}
-                  hint={FIELD_HINTS[key]}
+                  onInfo={() => setActiveInfoKey(key as CalibrateInfoKey)}
                   value={bikeForm[key] as number}
                   onChange={(v) => setBikeField(key, v)}
                 />
@@ -611,5 +637,12 @@ export default function CalibratePage() {
         )}
       </div>
     </div>
+
+      {/* Field details sidebar */}
+      <CalibrateInfoSidebar
+        activeKey={activeInfoKey}
+        onClose={() => setActiveInfoKey(null)}
+      />
+    </>
   );
 }
